@@ -10,10 +10,11 @@ struct Agenda lista[50]= {{"Teste"   , "Teste@gmail.com" , "Rua Teste"          
                       {"Teste 2"    , "Teste2@gmail.com", "Rua Teste 2"         , "Teste 2"     , "Apto. Teste 2"   , "Teste 2"     , "Testecity 2"     , "Teste State 2"   , "United States of Teste 2", 360   , 654321, 21, 22982004  , 25, 12, 0     },
                       {"Lucas"      , "lucas@gmail.com" , "Rua das Palmeiras"   , "Palmeiras"   , "Apto 1"          , "Centro"      , "Joinville"       , "Santa Catarina"  , "Brasil"                  ,  1    , 123   , 47, 999000099 , 24, 02, 2003  }
 };
+int lastPos = 3;
 int arrayLength = sizeof(lista) / sizeof(lista[0]);
 
 void buscarPessoa(char name[100], struct Agenda lista[arrayLength]){
-    for (int i=0;i<arrayLength;i++){
+    for (int i=0;i<lastPos;i++){
         if (strcmp(lista[i].nome, name) == 0){
             printf("Nome da Pessoa: %s\n", lista[i].nome);
             printf("E-mail da Pessoa: %s\n", lista[i].email);
@@ -25,7 +26,7 @@ void buscarPessoa(char name[100], struct Agenda lista[arrayLength]){
 }
 
 void aniversariantesDoMes(int mensal, struct Agenda lista[arrayLength]){
-    for (int i=0;i<arrayLength;i++){
+    for (int i=0;i<lastPos;i++){
         if (mensal == lista[i].mes){
             printf("%s faz aniversário no mês %d\n", lista[i].nome, lista[i].mes);
         }
@@ -33,7 +34,7 @@ void aniversariantesDoMes(int mensal, struct Agenda lista[arrayLength]){
 }
 
 void aniversariantesDoDia(int diario, int mensal, struct Agenda lista[arrayLength]){
-    for (int i=0;i<arrayLength;i++){
+    for (int i=0;i<lastPos;i++){
         if (mensal == lista[i].mes){
             if (diario == lista[i].dia){
                 printf("%s faz aniversário no dia %d/%d\n", lista[i].nome, lista[i].dia, lista[i].mes);
@@ -75,14 +76,16 @@ void inserePessoa(struct Agenda *a){
     scanf("%d", &a->mes);
     printf("Ano de Nascimento: ");
     scanf("%d", &a->ano);
+    lastPos++;
 }
 
 void removerUser(struct Agenda a[arrayLength], int pos){
-    for (int i=0;i<arrayLength;i++){
+    for (int i=0;i<lastPos;i++){
         if (i >= pos){
             a[i] = a[i+1];
         }
     }
+    lastPos--;
 }
 
 int main()
@@ -93,8 +96,9 @@ int main()
     // inserePessoa(&lista[3]);
     buscarPessoa("Lucas", lista);
     removerUser(lista, 2);
-    for (int i=0;i<arrayLength;i++){
-        if (lista[i].nome)
+    removerUser(lista, 1);
+    for (int i=0;i<lastPos;i++){
+        if (strcmp(lista[i].nome, "") != 0)
             printf("%s -> %d\n", lista[i].nome, i);
     }
     return 0;
