@@ -1,33 +1,42 @@
 #include <stdio.h>
+#include <string.h>
 
 struct Agenda{
     char nome[100], email[100], endereco[100], rua[100], complemento[100], bairro[100], cidade[100], estado[100], pais[100];
     int numero, cep, ddd, telefone, dia, mes, ano;
 };
 
-void buscarPessoa(char name[100], struct Agenda teste[2]){
-    for (int i=0;i<50;i++){
-        if (strcmp(teste[i].nome, name) == 0){
-            printf("Nome da Pessoa: %s\n", teste[i].nome);
-            printf("E-mail da Pessoa: %s\n", teste[i].email);
-            printf("Telefone da Pessoa: (%d)%d\n", teste[i].ddd, teste[i].telefone);
+struct Agenda lista[50]= {{"Teste"   , "Teste@gmail.com" , "Rua Teste"           , "Teste"       , "Apto. Teste"     , "Teste"       , "Testecity"       , "Teste State"     , "United States of Teste"  , 72    , 123456, 12, 40028922  , 12, 12, 2012  },
+                      {"Teste 2"    , "Teste2@gmail.com", "Rua Teste 2"         , "Teste 2"     , "Apto. Teste 2"   , "Teste 2"     , "Testecity 2"     , "Teste State 2"   , "United States of Teste 2", 360   , 654321, 21, 22982004  , 25, 12, 0     },
+                      {"Lucas"      , "lucas@gmail.com" , "Rua das Palmeiras"   , "Palmeiras"   , "Apto 1"          , "Centro"      , "Joinville"       , "Santa Catarina"  , "Brasil"                  ,  1    , 123   , 47, 999000099 , 24, 02, 2003  }
+};
+int arrayLength = sizeof(lista) / sizeof(lista[0]);
+
+void buscarPessoa(char name[100], struct Agenda lista[arrayLength]){
+    for (int i=0;i<arrayLength;i++){
+        if (strcmp(lista[i].nome, name) == 0){
+            printf("Nome da Pessoa: %s\n", lista[i].nome);
+            printf("E-mail da Pessoa: %s\n", lista[i].email);
+            printf("Telefone da Pessoa: (%d)%d\n", lista[i].ddd, lista[i].telefone);
+            return;
+        }
+    }
+    printf("Pessoa não encontrada.\n");
+}
+
+void aniversariantesDoMes(int mensal, struct Agenda lista[arrayLength]){
+    for (int i=0;i<arrayLength;i++){
+        if (mensal == lista[i].mes){
+            printf("%s faz aniversário no mês %d\n", lista[i].nome, lista[i].mes);
         }
     }
 }
 
-void aniversariantesDoMes(int mensal, struct Agenda teste[2]){
-    for (int i=0;i<2;i++){
-        if (mensal == teste[i].mes){
-            printf("%s faz aniversário no mês %d\n", teste[i].nome, teste[i].mes);
-        }
-    }
-}
-
-void aniversariantesDoDia(int diario, int mensal, struct Agenda teste[2]){
-    for (int i=0;i<2;i++){
-        if (mensal == teste[i].mes){
-            if (diario == teste[i].dia){
-                printf("%s faz aniversário no dia %d/%d\n", teste[i].nome, teste[i].dia, teste[i].mes);
+void aniversariantesDoDia(int diario, int mensal, struct Agenda lista[arrayLength]){
+    for (int i=0;i<arrayLength;i++){
+        if (mensal == lista[i].mes){
+            if (diario == lista[i].dia){
+                printf("%s faz aniversário no dia %d/%d\n", lista[i].nome, lista[i].dia, lista[i].mes);
             }
         }
     }
@@ -68,15 +77,25 @@ void inserePessoa(struct Agenda *a){
     scanf("%d", &a->ano);
 }
 
+void removerUser(struct Agenda a[arrayLength], int pos){
+    for (int i=0;i<arrayLength;i++){
+        if (i >= pos){
+            a[i] = a[i+1];
+        }
+    }
+}
+
 int main()
 {
-    struct Agenda teste[50]= {{"Teste", "Teste@gmail.com", "Rua Teste", "Teste", "Apto. Teste", "Teste", "Testecity", "Teste State", "United States of Teste", 69, 123456, 12, 40028922, 12, 12, 2012},
-                      {"Teste 2", "Teste2@gmail.com", "Rua Teste 2", "Teste 2", "Apto. Teste 2", "Teste 2", "Testecity 2", "Teste State 2", "United States of Teste 2", 420, 654321, 21, 22982004, 25, 12, 0}
-    };
-    buscarPessoa("Teste", teste);
-    aniversariantesDoMes(12, teste);
-    aniversariantesDoDia(12,12, teste);
-    inserePessoa(&teste[3]);
-    buscarPessoa("Lucas", teste);
+    buscarPessoa("Teste 2", lista);
+    aniversariantesDoMes(12, lista);
+    aniversariantesDoDia(12,12, lista);
+    // inserePessoa(&lista[3]);
+    buscarPessoa("Lucas", lista);
+    removerUser(lista, 2);
+    for (int i=0;i<arrayLength;i++){
+        if (lista[i].nome)
+            printf("%s -> %d\n", lista[i].nome, i);
+    }
     return 0;
 }
