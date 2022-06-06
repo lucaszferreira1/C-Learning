@@ -93,7 +93,7 @@ int main()
     buscarPessoa("Teste 2", lista);
     aniversariantesDoMes(12, lista);
     aniversariantesDoDia(12,12, lista);
-    // inserePessoa(&lista[3]);
+    inserePessoa(&lista[3]);
     buscarPessoa("Lucas", lista);
     removerUser(lista, 2);
     removerUser(lista, 1);
