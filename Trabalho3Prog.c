@@ -12,13 +12,16 @@ struct Agenda lista[50]= {{"Teste"   , "Teste@gmail.com" , "Rua Teste"          
                       {"Teste 2"    , "Teste2@gmail.com", "Rua Teste 2"         , "Teste 2"     , "Apto. Teste 2"   , "Teste 2"     , "Testecity 2"     , "Teste State 2"   , "United States of Teste 2", 360   , 654321, 21, 22982004  , 25, 12, 0     },
                       {"Lucas"      , "lucas@gmail.com" , "Rua das Palmeiras"   , "Palmeiras"   , "Apto 1"          , "Centro"      , "Joinville"       , "Santa Catarina"  , "Brasil"                  ,  1    , 123   , 47, 999000099 , 24, 02, 2003  }
 };
-// Variável para guardar o último índice da matriz
+// Variável para guardar o último índice da matriz, utilizada para encurtar loops
 int lastPos = 3;
 // Variável para guardar o tamanho da matriz
 int arrayLength = sizeof(lista) / sizeof(lista[0]);
 
 // Função para buscar pelo nome de uma pessoa
-void buscarPessoa(char name[100], struct Agenda lista[arrayLength]){
+void buscarPessoa(struct Agenda lista[arrayLength]){
+    char name[100];
+    printf("Digite o nome da Pessoa: \n");
+    scanf("%s", name);
     for (int i=0;i<lastPos;i++){
         if (strcmp(lista[i].nome, name) == 0){
             printf("Nome da Pessoa: %s\n", lista[i].nome);
@@ -31,7 +34,10 @@ void buscarPessoa(char name[100], struct Agenda lista[arrayLength]){
 }
 
 // Função para buscar todas as pessoas que fazem aniversário no mês dado
-void aniversariantesDoMes(int mensal, struct Agenda lista[arrayLength]){
+void aniversariantesDoMes(struct Agenda lista[arrayLength]){
+    int mensal;
+    printf("Digite o mês: \n");
+    scanf("%d", &mensal);
     for (int i=0;i<lastPos;i++){
         if (mensal == lista[i].mes){
             printf("%s faz aniversário no mês %d\n", lista[i].nome, lista[i].mes);
@@ -39,8 +45,13 @@ void aniversariantesDoMes(int mensal, struct Agenda lista[arrayLength]){
     }
 }
 
-// Função para buscar todas as pessoas que fazem aniversário no dia dado
-void aniversariantesDoDia(int diario, int mensal, struct Agenda lista[arrayLength]){
+// Função para buscar todas as pessoas que fazem aniversário no mês e dia inseridos
+void aniversariantesDoDia(struct Agenda lista[arrayLength]){
+    int diario, mensal;
+    printf("Digite o dia: \n");
+    scanf("%d", &diario);
+    printf("Digite o mês: \n");
+    scanf("%d", &mensal);
     for (int i=0;i<lastPos;i++){
         if (mensal == lista[i].mes){
             if (diario == lista[i].dia){
@@ -88,28 +99,56 @@ void inserePessoa(struct Agenda *a){
 }
 
 // Função para remover usuários da Agenda
-void removerUser(struct Agenda a[arrayLength], int pos){
+void removerUser(struct Agenda a[arrayLength]){
+    int pos;
+    printf("Digite a posição do registro: (começando do 0)\n");
+    scanf("%d", &pos);
     for (int i=0;i<lastPos;i++){
         if (i >= pos){
             a[i] = a[i+1];
         }
     }
-    lastPos--;
-}
-
-// Main
-int main()
-{
-    buscarPessoa("Teste 2", lista);
-    aniversariantesDoMes(12, lista);
-    aniversariantesDoDia(12,12, lista);
-    inserePessoa(&lista[lastPos]);
-    buscarPessoa("Lucas", lista);
-    removerUser(lista, 2);
-    removerUser(lista, 1);
+    printf("Agora a lista é: \n");
     for (int i=0;i<lastPos;i++){
         if (strcmp(lista[i].nome, "") != 0)
             printf("%s -> %d\n", lista[i].nome, i);
+    }
+    lastPos--;
+}
+
+// Main, Menu de 6 opções
+int main()
+{
+    int escolha;
+    while (1){
+        printf("--- Menu ---\n");
+        printf("Escolha uma das opções: \n");
+        printf("1 - Buscar uma Pessoa\n");
+        printf("2 - Aniversariantes do Mês\n");
+        printf("3 - Aniversarantes do Dia\n");
+        printf("4 - Inserir Pessoa\n");
+        printf("5 - Remover Pessoa\n");
+        printf("6 - Sair\n");
+        scanf("%d", &escolha);
+        switch(escolha){
+            case 1:
+                buscarPessoa(lista);
+                break;
+            case 2:
+                aniversariantesDoMes(lista);
+                break;
+            case 3:
+                aniversariantesDoDia(lista);
+                break;
+            case 4:
+                inserePessoa(&lista[lastPos]);
+                break;
+            case 5:
+                removerUser(lista);
+                break;
+            case 6:
+                return 0;
+        }
     }
     return 0;
 }
