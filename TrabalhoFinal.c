@@ -17,53 +17,63 @@ struct Agenda{
 void Cadastrar(){
     //Função para cadastrar elementos na lista
     struct Agenda novo_cadastro;
-    do{
+    
+    printf("Dia: ");
+    scanf("%d", &novo_cadastro.data.dia);
+    while((novo_cadastro.data.dia < 1) || (novo_cadastro.data.dia > 31)){
+        printf("Erro: Dia Invalido\n");
         printf("Dia: ");
         scanf("%d", &novo_cadastro.data.dia);
-    }while((novo_cadastro.data.dia < 1) || (novo_cadastro.data.dia > 31));
-    do{
+    }
+    printf("Mes: ");
+    scanf("%d", &novo_cadastro.data.mes);
+    while((novo_cadastro.data.mes < 1) || (novo_cadastro.data.mes > 12)){
+        printf("Erro: Mes Invalido\n");
         printf("Mes: ");
         scanf("%d", &novo_cadastro.data.mes);
-    }while((novo_cadastro.data.mes < 1) || (novo_cadastro.data.mes > 12));
-    do{
+    }
+    printf("Ano: ");
+    scanf("%d", &novo_cadastro.data.ano);
+    while(novo_cadastro.data.ano < 0){
+        printf("Erro: Ano invalido\n");
         printf("Ano: ");
         scanf("%d", &novo_cadastro.data.ano);
-    }while(novo_cadastro.data.ano < 0);
-    printf("Hora Inicio: ");
-    scanf("%d", &novo_cadastro.horaIni.hora);
-    while((novo_cadastro.horaIni.hora < 0) || (novo_cadastro.horaIni.hora > 24)){
-        printf("Erro: Hora Invalida");
+    }
+    
+    do{
+        if ((novo_cadastro.horaFim.minuto >= 0) && (novo_cadastro.horaFim.minuto <= 59))
+            printf("Erro: Colisao de Horarios\n");
+
         printf("Hora Inicio: ");
         scanf("%d", &novo_cadastro.horaIni.hora);
-    }
-    do{
-        if(novo_cadastro.horaFim.minuto){
-            printf("Erro: Colisao de Horarios");
+        while((novo_cadastro.horaIni.hora < 0) || (novo_cadastro.horaIni.hora > 24)){
+            printf("Erro: Hora Invalida\n");
+            printf("Hora Inicio: ");
+            scanf("%d", &novo_cadastro.horaIni.hora);
         }
-    printf("Minuto Inicio: ");
-    scanf("%d", &novo_cadastro.horaIni.minuto);
-    while((novo_cadastro.horaIni.minuto < 0) || (novo_cadastro.horaIni.minuto > 59)){
-        printf("Erro: Minuto Invalido");
         printf("Minuto Inicio: ");
         scanf("%d", &novo_cadastro.horaIni.minuto);
-    }
-    printf("Hora Fim: ");
-    scanf("%d", &novo_cadastro.horaFim.hora);
-    while((novo_cadastro.horaFim.hora < 0) || (novo_cadastro.horaFim.hora > 24)){
-        printf("Erro: Hora invalida");
+        while((novo_cadastro.horaIni.minuto < 0) || (novo_cadastro.horaIni.minuto > 59)){
+            printf("Erro: Minuto Invalido\n");
+            printf("Minuto Inicio: ");
+            scanf("%d", &novo_cadastro.horaIni.minuto);
+        }
         printf("Hora Fim: ");
         scanf("%d", &novo_cadastro.horaFim.hora);
-    }
-    printf("Minuto Fim: ");
-    scanf("%d", &novo_cadastro.horaFim.minuto);
-    while((novo_cadastro.horaFim.minuto < 0) || (novo_cadastro.horaFim.minuto > 59)){
-        printf("Erro: Minuto Invalido");
+        while((novo_cadastro.horaFim.hora < 0) || (novo_cadastro.horaFim.hora > 24)){
+            printf("Erro: Hora invalida\n");
+            printf("Hora Fim: ");
+            scanf("%d", &novo_cadastro.horaFim.hora);
+        }
         printf("Minuto Fim: ");
         scanf("%d", &novo_cadastro.horaFim.minuto);
-    }
+        while((novo_cadastro.horaFim.minuto < 0) || (novo_cadastro.horaFim.minuto > 59)){
+            printf("Erro: Minuto Invalido\n");
+            printf("Minuto Fim: ");
+            scanf("%d", &novo_cadastro.horaFim.minuto);
+        }
     }while((novo_cadastro.horaIni.hora > novo_cadastro.horaFim.hora) || ((novo_cadastro.horaIni.hora == novo_cadastro.horaFim.hora) && (novo_cadastro.horaIni.minuto >= novo_cadastro.horaFim.minuto)));
 
-    
     do{
         printf("Local: ");
         scanf("%s", novo_cadastro.local);
