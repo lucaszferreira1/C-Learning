@@ -14,7 +14,7 @@ struct Agenda{
     char local[100], desc[255];
 };
 
-void Cadastrar(){
+void Cadastrar(FILE *arq){
     //Função para cadastrar elementos na lista
     struct Agenda novo_cadastro;
     
@@ -81,7 +81,8 @@ void Cadastrar(){
     printf("Descrição: ");
     scanf("%s", novo_cadastro.desc);
     
-    printf("\n%s\n", novo_cadastro.desc);
+    // fseek(arq, 0, SEEK_END);
+    // fwrite(&novo_cadastro, sizeof(novo_cadastro), 1, arq);
 }
 
 void MostrarTudo(){
