@@ -165,7 +165,7 @@ void Remover(FILE *arq){
         if ((data_escolhida.dia == r.data.dia) && (data_escolhida.mes == r.data.mes) && (data_escolhida.ano == r.data.ano) && (hora_escolhida.hora == r.horaIni.hora) && (hora_escolhida.minuto == r.horaIni.minuto)){
             printf("Registro Deletado!\n");
         }else{
-            printf("%s\n", r.local);
+            fwrite(&r, sizeof(struct Agenda), 1, arq_temp);
         }
         fread(&r, sizeof(r), 1, arq);
     }while(!feof(arq));
