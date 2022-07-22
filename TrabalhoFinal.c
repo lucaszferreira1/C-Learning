@@ -93,7 +93,7 @@ void MostrarTudo(FILE *arq){
     do{
         printf("%s, Local: %s\n", r.desc, r.local);
         printf("Data: %.2d/%.2d/%.2d\n", r.data.dia, r.data.mes, r.data.ano);
-        printf("Horário: %.2d:%2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
+        printf("Horário: %.2d:%.2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
         fread(&r, sizeof(r), 1, arq);
     }while(!feof(arq));
 }
@@ -109,12 +109,13 @@ void MostrarData(FILE *arq){
     printf("Ano: ");
     scanf("%d", &data_escolhida.ano);
     printf("Mostrando Registros do dia: %.2d/%.2d/%.2d\n", data_escolhida.dia, data_escolhida.mes, data_escolhida.ano);
+    
     fseek(arq, 0, SEEK_SET);
     fread(&r, sizeof(r), 1, arq);
     do{
         if ((data_escolhida.dia == r.data.dia) && (data_escolhida.mes == r.data.mes) && (data_escolhida.ano == r.data.ano)){
             printf("%s, Local: %s\n", r.desc, r.local);
-            printf("Horário: %.2d:%2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
+            printf("Horário: %.2d:%.2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
         }
         fread(&r, sizeof(r), 1, arq);
     }while(!feof(arq));
@@ -129,25 +130,61 @@ void MostrarProximos(FILE *arq){
     for (i=0;i<5;i++){
         printf("%s, Local: %s\n", r.desc, r.local);
         printf("Data: %.2d/%.2d/%.2d\n", r.data.dia, r.data.mes, r.data.ano);
-        printf("Horário: %.2d:%2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
+        printf("Horário: %.2d:%.2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
         fread(&r, sizeof(r), 1, arq);
         if(feof(arq))
             break;
     }
 }
 
-void Remover(){
+void Remover(FILE *arq){
     //Função para remover tal elemento, recebe-se a data e hora inicial do mesmo
+    struct Dia data_escolhida;
+    struct Hora hora_escolhida;
+    
+    printf("Dia: ");
+    scanf("%d", &data_escolhida.dia);
+    printf("Mes: ");
+    scanf("%d", &data_escolhida.mes);
+    printf("Ano: ");
+    scanf("%d", &data_escolhida.ano);
+    printf("Hora de Início: ");
+    scanf("%d", &hora_escolhida.hora);
+    printf("Minuto de Início: ");
+    scanf("%d", &hora_escolhida.minuto);
+    
+    struct Agenda r;
+    FILE *arq_temp = fopen("arq_temp.dat", "w+b");
+    if(!arq_temp){
+        printf("Erro ao abrir arquivo temporário!\n");
+        return;
+    }
+    fseek(arq, 0, SEEK_SET);
+    fread(&r, sizeof(r), 1, arq);
+    do{
+        if ((data_escolhida.dia == r.data.dia) && (data_escolhida.mes == r.data.mes) && (data_escolhida.ano == r.data.ano) && (hora_escolhida.hora == r.horaIni.hora) && (hora_escolhida.minuto == r.horaIni.minuto)){
+            printf("Registro Deletado!\n");
+        }else{
+            printf("%s\n", r.local);
+        }
+        fread(&r, sizeof(r), 1, arq);
+    }while(!feof(arq));
+    
+    fclose(arq_temp);
 }
 
 int main()
 {
     int escolha;
-    FILE *arq = fopen("arquivo.txt", "w+");
-    fwrite(&testes,sizeof(struct Agenda),1,arq);
+    int i;
+    struct Agenda testes[6] = {{24, 2, 2003, 12, 30, 13, 0, "Joinville", "Isto é um Teste"}, {29, 5, 2004, 14, 0, 23, 59, "São Paulo", "Segundo Teste"}, {19, 9, 2012, 9, 40, 22, 0, "Recife", "Terceiro Teste"}, {1, 1, 2001, 2, 10, 19, 0, "Fortaleza", "Quarto Teste"}, {12, 12, 2012, 0, 12, 12, 12, "Acre", "Quinto Teste"}, {19, 9, 2009, 9, 9, 21, 9, "Manáus", "Sexto Teste"}};
+    FILE *arq = fopen("arquivo.dat", "w+b");
     if (!arq){
-        printf("Erro ao abrir o arquivo");
+        printf("Erro ao abrir o arquivo!\n");
         return 1;
+    }
+    for (i=0;i<6;i++){
+        fwrite(&testes[i], sizeof(struct Agenda), 1, arq);
     }
     while (1==1){
         printf("-=-=-=-=-= MENU =-=-=-=-=-\n");
@@ -173,10 +210,10 @@ int main()
                 MostrarProximos(arq);
                 break;
             case 5:
-                // Remover();
+                Remover(arq);
                 break;
             case 6:
-                // fclose(saida);
+                fclose(arq);
                 return 0;
                 break;
         }
