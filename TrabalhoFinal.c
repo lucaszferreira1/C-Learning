@@ -41,7 +41,7 @@ void Cadastrar(FILE *arq){
     }
     
     do{
-        if ((novo_cadastro.horaFim.minuto >= 0) && (novo_cadastro.horaFim.minuto <= 59))
+        if ((novo_cadastro.horaIni.hora > novo_cadastro.horaFim.hora) || ((novo_cadastro.horaIni.hora == novo_cadastro.horaFim.hora) && (novo_cadastro.horaIni.minuto >= novo_cadastro.horaFim.minuto)))
             printf("Erro: Colisao de Horarios\n");
 
         printf("Hora Inicio: ");
@@ -81,28 +81,59 @@ void Cadastrar(FILE *arq){
     printf("Descrição: ");
     scanf("%s", novo_cadastro.desc);
     
-    // fseek(arq, 0, SEEK_END);
-    // fwrite(&novo_cadastro, sizeof(novo_cadastro), 1, arq);
+    fseek(arq, 0, SEEK_END);
+    fwrite(&novo_cadastro, sizeof(novo_cadastro), 1, arq);
 }
 
-void MostrarTudo(){
+void MostrarTudo(FILE *arq){
     //Função para exibir todos os elementos da lista
+    struct Agenda r;
+    fseek(arq, 0, SEEK_SET);
+    fread(&r, sizeof(r), 1, arq);
+    do{
+        printf("%s, Local: %s\n", r.desc, r.local);
+        printf("Data: %.2d/%.2d/%.2d\n", r.data.dia, r.data.mes, r.data.ano);
+        printf("Horário: %.2d:%2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
+        fread(&r, sizeof(r), 1, arq);
+    }while(!feof(arq));
 }
 
-void MostrarData(){
+void MostrarData(FILE *arq){
     //Função para exibir todos os elementos em tal data lida
     struct Dia data_escolhida;
+    struct Agenda r;
     printf("Dia: ");
     scanf("%d", &data_escolhida.dia);
     printf("Mes: ");
     scanf("%d", &data_escolhida.mes);
     printf("Ano: ");
     scanf("%d", &data_escolhida.ano);
-    printf("%d/%d/%d\n", data_escolhida.dia, data_escolhida.mes, data_escolhida.ano);
+    printf("Mostrando Registros do dia: %.2d/%.2d/%.2d\n", data_escolhida.dia, data_escolhida.mes, data_escolhida.ano);
+    fseek(arq, 0, SEEK_SET);
+    fread(&r, sizeof(r), 1, arq);
+    do{
+        if ((data_escolhida.dia == r.data.dia) && (data_escolhida.mes == r.data.mes) && (data_escolhida.ano == r.data.ano)){
+            printf("%s, Local: %s\n", r.desc, r.local);
+            printf("Horário: %.2d:%2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
+        }
+        fread(&r, sizeof(r), 1, arq);
+    }while(!feof(arq));
 }
 
-void MostrarProximos(){
+void MostrarProximos(FILE *arq){
     //Função para mostrar os 5 próximos eventos da lista
+    struct Agenda r;
+    int i;
+    fseek(arq, 0, SEEK_SET);
+    fread(&r, sizeof(r), 1, arq);
+    for (i=0;i<5;i++){
+        printf("%s, Local: %s\n", r.desc, r.local);
+        printf("Data: %.2d/%.2d/%.2d\n", r.data.dia, r.data.mes, r.data.ano);
+        printf("Horário: %.2d:%2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
+        fread(&r, sizeof(r), 1, arq);
+        if(feof(arq))
+            break;
+    }
 }
 
 void Remover(){
@@ -112,6 +143,12 @@ void Remover(){
 int main()
 {
     int escolha;
+    FILE *arq = fopen("arquivo.txt", "w+");
+    fwrite(&testes,sizeof(struct Agenda),1,arq);
+    if (!arq){
+        printf("Erro ao abrir o arquivo");
+        return 1;
+    }
     while (1==1){
         printf("-=-=-=-=-= MENU =-=-=-=-=-\n");
         printf("(1) Cadastrar\n");
@@ -124,16 +161,16 @@ int main()
         
         switch(escolha){
             case 1:
-                Cadastrar();
+                Cadastrar(arq);
                 break;
             case 2:
-                // Mostrar();
+                MostrarTudo(arq);
                 break;
             case 3:
-                MostrarData();
+                MostrarData(arq);
                 break;
             case 4:
-                // MostrarProximos
+                MostrarProximos(arq);
                 break;
             case 5:
                 // Remover();
