@@ -73,13 +73,34 @@ void Cadastrar(FILE *arq){
             scanf("%d", &novo_cadastro.horaFim.minuto);
         }
     }while((novo_cadastro.horaIni.hora > novo_cadastro.horaFim.hora) || ((novo_cadastro.horaIni.hora == novo_cadastro.horaFim.hora) && (novo_cadastro.horaIni.minuto >= novo_cadastro.horaFim.minuto)));
-
+    
+    //Verificar se o Local Foi preenchido
     do{
         printf("Local: ");
         scanf("%s", novo_cadastro.local);
     }while(!novo_cadastro.local);
+    
+    //Input da descrição
     printf("Descrição: ");
     scanf("%s", novo_cadastro.desc);
+    
+    //Verificação de Colisão de dois horários
+    fseek(arq, 0, SEEK_SET);
+    fread(&r, sizeof(r), 1, arq);
+    do{
+        //Verifica a data primeiro
+        if ((r.data.dia == novo_cadastro.data.dia) && (r.data.mes == novo_cadastro.data.mes) && (r.data.ano == novo_cadastro.data.ano)){
+            //Verifica o horário
+            int cad_mins_ini = ((novo_cadastro.horaIni.Hora * 60) + novo_cadastro.horaIni.minuto);
+            int arq_mins_ini = ((r.horaIni.Hora * 60) + r.horaIni.minuto);
+            int cad_mins_fim = ((novo_cadastro.horaFim.Hora * 60) + novo_cadastro.horaFim.minuto) - cad_mins_ini;
+            int arq_mins_fim = ((r.horaFim.Hora * 60) + r.horaFim.minuto) - arq_mins_ini;
+            //Adicionar ação em caso de erro!!!
+            if ((cad_mins_ini <= arq_mins_fim) && (arq_mins_ini <= cad_mins_fim)){
+                printf("Erro");
+            }
+        fread(&r, sizeof(r), 1, arq);
+    }while(!feof(arq));
     
     fseek(arq, 0, SEEK_END);
     fwrite(&novo_cadastro, sizeof(novo_cadastro), 1, arq);
