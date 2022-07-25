@@ -17,6 +17,7 @@ struct Agenda{
 void Cadastrar(FILE *arq){
     //Função para cadastrar elementos na lista
     struct Agenda novo_cadastro;
+    int errorMsg = 0;
     
     printf("Dia: ");
     scanf("%d", &novo_cadastro.data.dia);
@@ -39,7 +40,11 @@ void Cadastrar(FILE *arq){
         printf("Ano: ");
         scanf("%d", &novo_cadastro.data.ano);
     }
-    
+    do{
+      if(errorMsg == 1){
+        printf("Erro: Colisão de horários: Horário está colidindo com um horário já cadastrado!\n");
+        errorMsg = 0;
+      }
     do{
         if ((novo_cadastro.horaIni.hora > novo_cadastro.horaFim.hora) || ((novo_cadastro.horaIni.hora == novo_cadastro.horaFim.hora) && (novo_cadastro.horaIni.minuto >= novo_cadastro.horaFim.minuto)))
             printf("Erro: Colisao de Horarios\n");
@@ -85,26 +90,31 @@ void Cadastrar(FILE *arq){
     scanf("%s", novo_cadastro.desc);
     
     //Verificação de Colisão de dois horários
+    struct Agenda r;
     fseek(arq, 0, SEEK_SET);
     fread(&r, sizeof(r), 1, arq);
     do{
         //Verifica a data primeiro
         if ((r.data.dia == novo_cadastro.data.dia) && (r.data.mes == novo_cadastro.data.mes) && (r.data.ano == novo_cadastro.data.ano)){
             //Verifica o horário
-            int cad_mins_ini = ((novo_cadastro.horaIni.Hora * 60) + novo_cadastro.horaIni.minuto);
-            int arq_mins_ini = ((r.horaIni.Hora * 60) + r.horaIni.minuto);
-            int cad_mins_fim = ((novo_cadastro.horaFim.Hora * 60) + novo_cadastro.horaFim.minuto) - cad_mins_ini;
-            int arq_mins_fim = ((r.horaFim.Hora * 60) + r.horaFim.minuto) - arq_mins_ini;
+            int cad_mins_ini = ((novo_cadastro.horaIni.hora * 60) + novo_cadastro.horaIni.minuto);
+            int arq_mins_ini = ((r.horaIni.hora * 60) + r.horaIni.minuto);
+            int cad_mins_fim = ((novo_cadastro.horaFim.hora * 60) + novo_cadastro.horaFim.minuto);
+            int arq_mins_fim = ((r.horaFim.hora * 60) + r.horaFim.minuto);
             //Adicionar ação em caso de erro!!!
-            if ((cad_mins_ini <= arq_mins_fim) && (arq_mins_ini <= cad_mins_fim)){
-                printf("Erro");
+            if ((cad_mins_ini < arq_mins_fim) && (arq_mins_ini < cad_mins_fim)){
+                errorMsg = 1;
             }
+          }
         fread(&r, sizeof(r), 1, arq);
     }while(!feof(arq));
-    
+  }while(errorMsg);
+  
     fseek(arq, 0, SEEK_END);
     fwrite(&novo_cadastro, sizeof(novo_cadastro), 1, arq);
+    printf("Novo registro na agenda cadastrado com sucesso!");
 }
+
 
 void MostrarTudo(FILE *arq){
     //Função para exibir todos os elementos da lista
@@ -123,7 +133,7 @@ void MostrarData(FILE *arq){
     //Função para exibir todos os elementos em tal data lida
     struct Dia data_escolhida;
     struct Agenda r;
-    printf("Dia: ");
+    printf("\nDia: ");
     scanf("%d", &data_escolhida.dia);
     printf("Mes: ");
     scanf("%d", &data_escolhida.mes);
@@ -149,6 +159,8 @@ void MostrarProximos(FILE *arq){
     fseek(arq, 0, SEEK_SET);
     fread(&r, sizeof(r), 1, arq);
     for (i=0;i<5;i++){
+        if (!r.data.ano)
+          break;
         printf("%s, Local: %s\n", r.desc, r.local);
         printf("Data: %.2d/%.2d/%.2d\n", r.data.dia, r.data.mes, r.data.ano);
         printf("Horário: %.2d:%.2d - %.2d:%.2d\n\n", r.horaIni.hora, r.horaIni.minuto, r.horaFim.hora, r.horaFim.minuto);
@@ -192,13 +204,27 @@ void Remover(FILE *arq){
     }while(!feof(arq));
     
     fclose(arq_temp);
+    fclose(arq);
+
+    remove("arquivo.dat");
+    rename("arq_temp.dat", "arquivo.dat");
 }
+
+//void ordenarAgenda(FILE *arq){
+	//struct Agenda r; 
+	//fseek(arq, 0, SEEK_SET);
+ //   fread(&r, sizeof(r), 1, arq);
+//    do{
+		
+//		fread(&r, sizeof(r), 1, arq);
+ //   }while(!feof(arq));
+//}
 
 int main()
 {
     int escolha;
     int i;
-    struct Agenda testes[6] = {{24, 2, 2003, 12, 30, 13, 0, "Joinville", "Isto é um Teste"}, {29, 5, 2004, 14, 0, 23, 59, "São Paulo", "Segundo Teste"}, {19, 9, 2012, 9, 40, 22, 0, "Recife", "Terceiro Teste"}, {1, 1, 2001, 2, 10, 19, 0, "Fortaleza", "Quarto Teste"}, {12, 12, 2012, 0, 12, 12, 12, "Acre", "Quinto Teste"}, {19, 9, 2009, 9, 9, 21, 9, "Manáus", "Sexto Teste"}};
+    struct Agenda testes[6] = {{24, 2, 2003, 12, 30, 13, 0, "Joinville", "Isto é um Teste"}, {24, 2, 2003, 13, 00, 14, 30, "Área 51", "Datas iguais"}, {29, 5, 2004, 14, 0, 23, 59, "São Paulo", "Segundo Teste"}, {19, 9, 2012, 9, 40, 22, 0, "Recife", "Terceiro Teste"}, {1, 1, 2001, 2, 10, 19, 0, "Fortaleza", "Quarto Teste"}, {12, 12, 2012, 0, 12, 12, 12, "Acre", "Quinto Teste"}, {19, 9, 2009, 9, 9, 21, 9, "Manáus", "Sexto Teste"}};
     FILE *arq = fopen("arquivo.dat", "w+b");
     if (!arq){
         printf("Erro ao abrir o arquivo!\n");
@@ -232,6 +258,7 @@ int main()
                 break;
             case 5:
                 Remover(arq);
+                FILE *arq = fopen("arquivo.dat", "r+b");
                 break;
             case 6:
                 fclose(arq);
