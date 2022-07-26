@@ -101,7 +101,6 @@ void Cadastrar(FILE *arq){
             int arq_mins_ini = ((r.horaIni.hora * 60) + r.horaIni.minuto);
             int cad_mins_fim = ((novo_cadastro.horaFim.hora * 60) + novo_cadastro.horaFim.minuto);
             int arq_mins_fim = ((r.horaFim.hora * 60) + r.horaFim.minuto);
-            //Adicionar ação em caso de erro!!!
             if ((cad_mins_ini < arq_mins_fim) && (arq_mins_ini < cad_mins_fim)){
                 errorMsg = 1;
             }
@@ -112,7 +111,7 @@ void Cadastrar(FILE *arq){
   
     fseek(arq, 0, SEEK_END);
     fwrite(&novo_cadastro, sizeof(novo_cadastro), 1, arq);
-    printf("Novo registro na agenda cadastrado com sucesso!");
+    printf("Novo registro na agenda cadastrado com sucesso!\n");
 }
 
 
@@ -209,28 +208,48 @@ void Remover(FILE *arq){
     remove("arquivo.dat");
     rename("arq_temp.dat", "arquivo.dat");
 }
-
-//void ordenarAgenda(FILE *arq){
-	//struct Agenda r; 
-	//fseek(arq, 0, SEEK_SET);
- //   fread(&r, sizeof(r), 1, arq);
-//    do{
-		
-//		fread(&r, sizeof(r), 1, arq);
- //   }while(!feof(arq));
-//}
+//Tentei fazer a função para ordenar a lista porém alguma coisa esta fazendo datas como 01/01/2001 ficarem no meio da lista
+/*void OrdenarAgenda(FILE *arq){
+	struct Agenda r;
+	struct Agenda aux;
+	struct Agenda *orderedList = malloc(sizeof(struct Agenda));
+	int i = 0;
+	int j, h;
+	
+	fseek(arq, 0, SEEK_SET);
+    fread(&r, sizeof(r), 1, arq);
+	do{
+		orderedList = realloc(orderedList, sizeof(struct Agenda) * (i+1));
+		orderedList[i] = r;
+		i++;
+		fread(&r, sizeof(r), 1, arq);
+    }while(!feof(arq));
+	int temp1, temp2;
+	for (j=0;j<i;j++){
+		for (h=0;h<(i-1);h++){
+			temp1 = (orderedList[j].horaIni.hora * 60) + (orderedList[j].horaIni.minuto);
+			temp2 = (orderedList[j+1].horaIni.hora * 60) + (orderedList[j+1].horaIni.minuto);
+			if ((orderedList[j].data.ano > orderedList[j+1].data.ano) || ((orderedList[j].data.ano == orderedList[j+1].data.ano) && (orderedList[j].data.mes > orderedList[j+1].data.mes)) || ((orderedList[j].data.ano == orderedList[j+1].data.ano) && (orderedList[j].data.mes == orderedList[j+1].data.mes) && (orderedList[j].data.dia > orderedList[j+1].data.dia)) || ((orderedList[j].data.ano == orderedList[j+1].data.ano) && (orderedList[j].data.mes == orderedList[j+1].data.mes) && (orderedList[j].data.dia == orderedList[j+1].data.dia) && (temp1 > temp2))){
+				aux = orderedList[j];
+	            orderedList[j] = orderedList[j+1];
+	            orderedList[j+1] = aux;
+			    fwrite(&orderedList[j], sizeof(struct Agenda), 1, arq_temp);
+			}
+		}
+	}
+}*/
 
 int main()
 {
     int escolha;
     int i;
-    struct Agenda testes[6] = {{24, 2, 2003, 12, 30, 13, 0, "Joinville", "Isto é um Teste"}, {24, 2, 2003, 13, 00, 14, 30, "Área 51", "Datas iguais"}, {29, 5, 2004, 14, 0, 23, 59, "São Paulo", "Segundo Teste"}, {19, 9, 2012, 9, 40, 22, 0, "Recife", "Terceiro Teste"}, {1, 1, 2001, 2, 10, 19, 0, "Fortaleza", "Quarto Teste"}, {12, 12, 2012, 0, 12, 12, 12, "Acre", "Quinto Teste"}, {19, 9, 2009, 9, 9, 21, 9, "Manáus", "Sexto Teste"}};
+    struct Agenda testes[] = {{25, 2, 2003, 12, 30, 13, 0, "Joinville", "Isto é um Teste"}, {24, 2, 2003, 13, 00, 14, 30, "Área 51", "Datas iguais"}, {29, 5, 2007, 14, 0, 23, 59, "São Paulo", "Segundo Teste"}, {19, 9, 2012, 9, 40, 22, 0, "Recife", "Terceiro Teste"}, {1, 1, 2001, 2, 10, 19, 0, "Fortaleza", "Quarto Teste"}, {12, 12, 2012, 0, 12, 12, 12, "Acre", "Quinto Teste"}, {19, 9, 2009, 9, 9, 21, 9, "Manáus", "Sexto Teste"}};
     FILE *arq = fopen("arquivo.dat", "w+b");
     if (!arq){
         printf("Erro ao abrir o arquivo!\n");
         return 1;
     }
-    for (i=0;i<6;i++){
+    for (i=0;i<7;i++){
         fwrite(&testes[i], sizeof(struct Agenda), 1, arq);
     }
     while (1==1){
