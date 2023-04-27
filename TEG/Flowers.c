@@ -5,6 +5,8 @@
 
 #define MAXCHAR 128
 
+// Estrutura da flor, sendo, "sepal.length","sepal.width","petal.length","petal.width","variety"
+
 typedef struct{
     float sepLen, sepWid, petLen, petWid;
     char nome[16];
