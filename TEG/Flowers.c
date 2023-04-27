@@ -80,7 +80,7 @@ int main()
             char str[150];
             fprintf(fp, "150\n");
             for (int i = 0;i < 150;i++){
-                for (int j = 0;j < 150;j++){
+                for (int j = i;j < 150;j++){
                     // char c = matriz[i][j] + '0';
                     // str[j] = c;
                     if (matriz[i][j] == 1){
