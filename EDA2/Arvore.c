@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 typedef struct no {
+    struct no* pai;
     struct no* esquerda; //ponteiro para o nó filho a esquerda
     struct no* direita; //ponteiro para o nó filho a direita
     int valor; //conteúdo genérico do nó
@@ -54,12 +55,17 @@ No* removerFila(Fila* fila){
     return NULL;
 }
 
-No* cria(int valor) {
+No* cria(int valor, No* pai) {
     No *no;
     no = malloc(sizeof(No));
     no->esquerda = NULL;
     no->direita = NULL;
     no->valor = valor;
+    if (pai != NULL){
+        no->pai = pai;
+    }else{
+        no->pai = NULL;
+    }
     
     return no;
 }
@@ -68,14 +74,14 @@ int vazio(No* no) {
     return (no == NULL);
 }
 
-No* adiciona(No* no, int valor) {
-    if (no == NULL) {
-        return cria(valor);
-    }else if(no->valor > valor){
-        no->esquerda = adiciona(no->esquerda, valor);
-    }else if (no->valor < valor){
-        no->direita = adiciona(no->direita, valor);
-    }
+No* adiciona(No* no, int valor, No* pai) {
+    if (no == NULL) 
+        return cria(valor, pai);
+    else if(no->valor > valor)
+        no->esquerda = adiciona(no->esquerda, valor, no);
+    else if (no->valor < valor)
+        no->direita = adiciona(no->direita, valor, no);
+    
     return no;
 }
 
@@ -118,17 +124,36 @@ void percorrerLargura(No* no){
     }
 }
 
+void printNo(No* no){
+    printf("\nPai: ");
+    if (no->pai != NULL)
+        printf("%d", no->pai->valor);
+    else
+        printf("NULL");
+    printf("\nEsquerda: ");
+    if (no->esquerda != NULL)
+        printf("%d", no->esquerda->valor);
+    else
+        printf("NULL");
+    printf("\nDireita: ");
+    if (no->direita != NULL)
+        printf("%d", no->direita->valor);
+    else
+        printf("NULL");
+    printf("\nValor: %d", no->valor);
+}
+
 int main()
 {
-    No *raiz = cria(4);
-    adiciona(raiz, 2);
-    adiciona(raiz, 8);
-    adiciona(raiz, 1);
-    adiciona(raiz, 3);
-    adiciona(raiz, 6);
-    adiciona(raiz, 9);
-    adiciona(raiz, 5);
-    adiciona(raiz, 7);
+    No *raiz = cria(4, NULL);
+    adiciona(raiz, 2, NULL);
+    adiciona(raiz, 8, NULL);
+    adiciona(raiz, 1, NULL);
+    adiciona(raiz, 3, NULL);
+    adiciona(raiz, 6, NULL);
+    adiciona(raiz, 9, NULL);
+    adiciona(raiz, 5, NULL);
+    adiciona(raiz, 7, NULL);
     percorrerPre(raiz);
     printf("\n");
     percorrerPos(raiz);
