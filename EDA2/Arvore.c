@@ -74,6 +74,25 @@ int vazio(No* no) {
     return (no == NULL);
 }
 
+void printNo(No* no){
+    printf("\nPai: ");
+    if (no->pai != NULL)
+        printf("%d", no->pai->valor);
+    else
+        printf("NULL");
+    printf("\nEsquerda: ");
+    if (no->esquerda != NULL)
+        printf("%d", no->esquerda->valor);
+    else
+        printf("NULL");
+    printf("\nDireita: ");
+    if (no->direita != NULL)
+        printf("%d", no->direita->valor);
+    else
+        printf("NULL");
+    printf("\nValor: %d", no->valor);
+}
+
 No* adiciona(No* no, int valor, No* pai) {
     if (no == NULL) 
         return cria(valor, pai);
@@ -122,25 +141,6 @@ void percorrerLargura(No* no){
         if (no->direita)
             adicionarFila(fila, no->direita);
     }
-}
-
-void printNo(No* no){
-    printf("\nPai: ");
-    if (no->pai != NULL)
-        printf("%d", no->pai->valor);
-    else
-        printf("NULL");
-    printf("\nEsquerda: ");
-    if (no->esquerda != NULL)
-        printf("%d", no->esquerda->valor);
-    else
-        printf("NULL");
-    printf("\nDireita: ");
-    if (no->direita != NULL)
-        printf("%d", no->direita->valor);
-    else
-        printf("NULL");
-    printf("\nValor: %d", no->valor);
 }
 
 int main()
