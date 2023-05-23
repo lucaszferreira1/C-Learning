@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-enum coloracao { Vermelho, Preto };
+enum coloracao { Preto, Vermelho };
 
 typedef enum coloracao Cor;
 
@@ -54,6 +54,7 @@ No* adicionar(Arvore* arvore, int valor) {
     } else {
         No* no = adicionarNo(arvore->raiz, valor);
         balancear(arvore, no);
+        printf("Adicionando %d\n",valor);
         return no;
     }
 }
@@ -61,51 +62,45 @@ No* adicionar(Arvore* arvore, int valor) {
 No* adicionarNo(No* no, int valor) {
     if (valor > no->valor) {
         if (no->direita == NULL) {
-            printf("Adicionando %d\n",valor);
             No* novo = malloc(sizeof(No));
             novo->valor = valor;
             novo->pai = no;
             novo->esquerda = NULL;
             novo->direita = NULL;
-            novo->cor = Preto;
+            novo->cor = Vermelho;
 
             no->direita = novo;
 				
             return novo;
-        } else {
+        } else 
             return adicionarNo(no->direita, valor);
-        }
-    } else {
-        if (no->esquerda == NULL) {
-            printf("Adicionando %d\n",valor);
+    } else if (no->esquerda == NULL) {
             No* novo = malloc(sizeof(No));
 			novo->valor = valor;
             novo->pai = no;
             novo->esquerda = NULL;
             novo->direita = NULL;
-            novo->cor = Preto;
+            novo->cor = Vermelho;
 			
             no->esquerda = novo;
 			
             return novo;
-        } else {
+        } else 
             return adicionarNo(no->esquerda, valor);
-        }
-    }
 }
 
 void balancear(Arvore* arvore, No* no) {
-    while (no->pai->cor == Vermelho) { //Garante que todos os níveis foram balanceados
+    while (arvore->raiz != no && no->pai->cor == Vermelho) { //Garante que todos os níveis foram balanceados
         if (no->pai == no->pai->pai->esquerda) {
-                No *tio = no->pai->pai->direita;
-                    
-                if (tio->cor == Vermelho) {
-                    tio->cor = Preto; //Resolve caso 2
-                    no->pai->cor = Preto;
-                    no->pai->pai->cor = Vermelho;
-                    no = no->pai->pai; //Vai para o nível anterior
-                } else {
-                    if (no == no->pai->direita) {
+            No *tio = no->pai->pai->direita;
+            
+            if (tio != NULL && tio->cor == Vermelho) {
+                tio->cor = Preto; //Resolve caso 2
+                no->pai->cor = Preto;
+                no->pai->pai->cor = Vermelho;
+                no = no->pai->pai; //Vai para o nível anterior
+            } else {
+                if (no == no->pai->direita) {
                     no = no->pai; //Vai para o nível anterior
                     rotacionarEsquerda(arvore, no); //Resolve caso 3
                 } else {
@@ -114,16 +109,17 @@ void balancear(Arvore* arvore, No* no) {
                     rotacionarDireita(arvore, no->pai->pai);
                 }
             }
-        } else if (no->pai == no->pai->pai->direita) {
-                No *tio = no->pai->pai->esquerda;
-                    
-                if (tio->cor == Vermelho) {
-                    tio->cor = Preto; //Resolve caso 2
-                    no->pai->cor = Preto;
-                    no->pai->pai->cor = Vermelho;
-                    no = no->pai->pai; //Vai para o nível anterior
-                } else {
-                    if (no == no->pai->esquerda) {
+        } else if (no->pai == no->pai->pai->direita){
+        //Repete o mesmo código do bloco if, invertendo o lado dos direita e esquerda
+            No *tio = no->pai->pai->esquerda;
+            
+            if (tio != NULL && tio->cor == Vermelho) {
+                tio->cor = Preto; //Resolve caso 2
+                no->pai->cor = Preto;
+                no->pai->pai->cor = Vermelho;
+                no = no->pai->pai; //Vai para o nível anterior
+            } else {
+                if (no == no->pai->esquerda) {
                     no = no->pai; //Vai para o nível anterior
                     rotacionarDireita(arvore, no); //Resolve caso 3
                 } else {
@@ -191,6 +187,11 @@ int main()
     adicionar(a, 9);
     adicionar(a, 5);
     adicionar(a, 7);
+    adicionar(a, 10);
+    adicionar(a, 11);
+    
+    // No* teste = a->raiz->direita->direita->direita;
+    // printf("%d %d", teste->valor, teste->cor);
     
     percorrer(a->raiz, visitar);
     
