@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX 100
+
 enum coloracao { Preto, Vermelho };
 
 typedef enum coloracao Cor;
@@ -175,23 +177,35 @@ void percorrer(No* no, void (*callback)(int)) {
     }
 }
 
+int compara(const void* a, const void* b) {
+    return (*(int*) a - *(int*) b);
+}
+
+int* geraVetor(int n) {
+    int* v = malloc(sizeof(int) * n);
+    
+    for (int i = 0; i < n; i++) {
+        v[i] = (rand() % n) * MAX;
+    }
+
+    qsort(v, n, sizeof(int), compara);
+
+    return v;
+}
+
 int main()
 {
-    Arvore* a = criar();
-    adicionar(a, 4);
-    adicionar(a, 2);
-    adicionar(a, 8);
-    adicionar(a, 1);
-    adicionar(a, 3);
-    adicionar(a, 6);
-    adicionar(a, 9);
-    adicionar(a, 5);
-    adicionar(a, 7);
-    adicionar(a, 10);
-    adicionar(a, 11);
+    int n = 1000;
+    int* v = geraVetor(n + 1);
+
+    int medio = v[rand() % n];
+    int pior = (n * MAX) + 1;
+    int melhor = v[0];
     
-    // No* teste = a->raiz->direita->direita->direita;
-    // printf("%d %d", teste->valor, teste->cor);
+    Arvore* a = criar();
+    for (int i=0;i<n;i++){
+        adicionar(a, v[i]);
+    }
     
     percorrer(a->raiz, visitar);
     
