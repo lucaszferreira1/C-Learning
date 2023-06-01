@@ -158,17 +158,36 @@ void adicionaChaveRecursivo(ArvoreB* arvore, No* no, No* novo, int chave) {
 }
 
 
+int compara(const void* a, const void* b) {
+    return (*(int*) a - *(int*) b);
+}
+
+int* geraVetor(int n) {
+    int* v = malloc(sizeof(int) * n);
+    
+    for (int i = 0; i < n; i++) {
+        v[i] = (rand() % n) * MAX;
+    }
+
+    qsort(v, n, sizeof(int), compara);
+
+    return v;
+}
+
 int main()
 {
 
+    int n = 1000;
+    int* v = geraVetor(n + 1);
+
+    int medio = v[rand() % n];
+    int pior = (n * MAX) + 1;
+    int melhor = v[0];
+
     ArvoreB* arvore_B = criaArvore(1);
-    adicionaChave(arvore_B, 9);
-    adicionaChave(arvore_B, 3);
-    adicionaChave(arvore_B, 11);
-    adicionaChave(arvore_B, 7);
-    adicionaChave(arvore_B, 8);
-    adicionaChave(arvore_B, 5);
-    adicionaChave(arvore_B, 1);
+    for (int i=0;i<n;i++){
+        adicionaChave(arvore_B, v[i]);
+    }
     
     percorreArvore(arvore_B->raiz, visitar);
 
