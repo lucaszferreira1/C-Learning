@@ -221,17 +221,36 @@ No* adicionaAVL(No* no, int valor) {
     return no;
 }
 
+int compara(const void* a, const void* b) {
+    return (*(int*) a - *(int*) b);
+}
+
+int* geraVetor(int n) {
+    int* v = malloc(sizeof(int) * n);
+    
+    for (int i = 0; i < n; i++) {
+        v[i] = (rand() % n) * MAX;
+    }
+
+    qsort(v, n, sizeof(int), compara);
+
+    return v;
+}
+
 int main()
 {
-    No *raiz = adiciona(raiz, 4, NULL);
-    raiz = adicionaAVL(raiz, 2);
-    raiz = adicionaAVL(raiz, 8);
-    raiz = adicionaAVL(raiz, 1);
-    raiz = adicionaAVL(raiz, 3);
-    raiz = adicionaAVL(raiz, 6);
-    raiz = adicionaAVL(raiz, 9);
-    raiz = adicionaAVL(raiz, 5);
-    raiz = adicionaAVL(raiz, 7);
+    
+    int n = 1000;
+    int* v = geraVetor(n + 1);
+
+    int medio = v[rand() % n];
+    int pior = (n * MAX) + 1;
+    int melhor = v[0];
+    
+    No *raiz = adiciona(raiz, v[0], NULL);
+    for (int i=1;i<n;i++){
+        raiz = adicionaAVL(raiz, v[i]);
+    }
     
     printf("\n");
     percorrerLargura(raiz);
