@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX 100
+
 typedef struct no {
     struct no* pai;
     struct no* esquerda; //ponteiro para o nó filho a esquerda
