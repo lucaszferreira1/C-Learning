@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define MAX 100
+#define MAX 1
 
 typedef struct no {
     int total;
@@ -159,7 +160,6 @@ void adicionaChaveRecursivo(ArvoreB* arvore, No* no, No* novo, int chave) {
     }
 }
 
-
 int compara(const void* a, const void* b) {
     return (*(int*) a - *(int*) b);
 }
@@ -179,19 +179,23 @@ int* geraVetor(int n) {
 int main()
 {
 
-    int n = 1000;
+    int n = 10000;
     int* v = geraVetor(n + 1);
 
     int medio = v[rand() % n];
     int pior = (n * MAX) + 1;
     int melhor = v[0];
 
+    clock_t begin = clock();
     ArvoreB* arvore_B = criaArvore(1);
     for (int i=0;i<n;i++){
         adicionaChave(arvore_B, v[i]);
     }
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     
     percorreArvore(arvore_B->raiz, visitar);
-
+    printf("\n%f", time_spent);
+    
     return 0;
 }
