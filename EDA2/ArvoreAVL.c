@@ -1,226 +1,242 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
 
-#define MAX 100
+#define MAX 1
 
 typedef struct no {
     struct no* pai;
-    struct no* esquerda; //ponteiro para o nó filho a esquerda
-    struct no* direita; //ponteiro para o nó filho a direita
-    int valor; //conteúdo genérico do nó
+    struct no* esquerda;
+    struct no* direita;
+    int valor;
 } No;
 
-typedef struct elemento{
-    struct elemento* proximo;
-    No* no;
-}Elemento;
+typedef struct arvore {
+    struct no* raiz;
+} Arvore;
 
-typedef struct fila{
-    Elemento* inicial;
-    Elemento* final;
-} Fila;
+void balanceamento(Arvore*, No*);
+int altura(No*);
+int fb(No*);
+No* rsd(Arvore*, No*);
+No* rse(Arvore*, No*);
+No* rdd(Arvore*, No*);
+No* rde(Arvore*, No*);
 
-Fila* criaFila(){
-    Fila* fila;
-    fila = malloc(sizeof(Fila));
-    fila->inicial = NULL;
-    fila->final = NULL;
-    return fila;
+Arvore* criar() {
+    Arvore *arvore = malloc(sizeof(Arvore));
+    arvore->raiz = NULL;
+  
+    return arvore;
 }
 
-void adicionarFila(Fila* fila, No* no){
-    Elemento* ele = malloc(sizeof(Elemento));
-    ele->no = no;
-    ele->proximo = NULL;
-    if (fila->final){
-        fila->final->proximo = ele;
-    }else{
-        fila->inicial = ele;
-    }
-    fila->final = ele;
+int vazia(Arvore* arvore) {
+    return arvore->raiz == NULL;
 }
 
-No* removerFila(Fila* fila){
-    if (fila->inicial){
-        Elemento* ele = fila->inicial;
-        No* no = ele->no;
-        if (fila->inicial == fila->final){
-            fila->inicial = NULL;
-            fila->final = NULL;
-        }else{
-            fila->inicial = ele->proximo;
+No* adicionarNo(No* no, int valor) {
+    if (valor > no->valor) {
+        if (no->direita == NULL) {
+            printf("Adicionando %d\n",valor);
+            No* novo = malloc(sizeof(No));
+            novo->valor = valor;
+            novo->pai = no;
+            novo->esquerda = NULL;
+            novo->direita = NULL;
+
+            no->direita = novo;
+				
+            return novo;
+        } else {
+            return adicionarNo(no->direita, valor);
         }
-        free(ele);
+    } else {
+        if (no->esquerda == NULL) {
+            printf("Adicionando %d\n",valor);
+            No* novo = malloc(sizeof(No));
+			novo->valor = valor;
+            novo->pai = no;
+            novo->esquerda = NULL;
+            novo->direita = NULL;
+			
+            no->esquerda = novo;
+			
+            return novo;
+        } else {
+            return adicionarNo(no->esquerda, valor);
+        }
+    }
+}
+
+No* adicionar(Arvore* arvore, int valor) {
+    if (vazia(arvore)) {
+        printf("Adicionando %d\n",valor);
+        No* novo = malloc(sizeof(No));
+        novo->valor = valor;
+        novo->pai = NULL;
+        novo->esquerda = NULL;
+        novo->direita = NULL;
         
+        arvore->raiz = novo;
+			
+        return novo;
+    } else {
+        No* no = adicionarNo(arvore->raiz, valor);
+        balanceamento(arvore, no);
         return no;
     }
+}
+
+No* localizar(No* no, int valor) {
+    if (no->valor == valor) {
+        return no;
+    } else {
+        if (valor < no->valor) {
+            if (no->esquerda != NULL) {
+                return localizar(no->esquerda, valor);
+            }
+        } else {
+            if (no->direita != NULL) {
+                return localizar(no->direita, valor);
+            }
+        }
+    }
+
     return NULL;
 }
 
-No* cria(int valor, No* pai) {
-    No *no;
-    no = malloc(sizeof(No));
-    no->esquerda = NULL;
-    no->direita = NULL;
-    no->valor = valor;
-    if (pai != NULL){
-        no->pai = pai;
-    }else{
-        no->pai = NULL;
+void percorrer(No* no, void (*callback)(int)) {
+    if (no != NULL) {
+        percorrer(no->esquerda,callback);
+        callback(no->valor);
+        percorrer(no->direita,callback);
     }
-    
-    return no;
 }
 
-int vazio(No* no) {
-    return (no == NULL);
+void visitar(int valor){
+    printf("%d ", valor);
+}
+
+void balanceamento(Arvore* arvore, No* no) {
+    while (no != NULL) {
+        int fator = fb(no);
+
+        if (fator > 1) { //árvore mais pesada para esquerda
+            //rotação para a direita
+            if (fb(no->esquerda) > 0) {
+                printf("RSD(%d)\n",no->valor);
+                rsd(arvore, no); //rotação simples a direita, pois o FB do filho tem sinal igual
+            } else {
+                printf("RDD(%d)\n",no->valor);
+                rdd(arvore, no); //rotação dupla a direita, pois o FB do filho tem sinal diferente
+            }
+        } else if (fator < -1) { //árvore mais pesada para a direita
+            //rotação para a esquerda
+            if (fb(no->direita) < 0) {
+                printf("RSE(%d)\n",no->valor);
+                rse(arvore, no); //rotação simples a esquerda, pois o FB do filho tem sinal igual
+            } else {
+                printf("RDE(%d)\n",no->valor);
+                rde(arvore, no); //rotação dupla a esquerda, pois o FB do filho tem sinal diferente
+            }
+        }
+
+        no = no->pai; 
+    }
 }
 
 int altura(No* no){
-    int hesquerda = 0;
-    int hdireita = 0;
-    if (no->esquerda != NULL) 
-        hesquerda = altura(no->esquerda) + 1;
-    if (no->direita != NULL) 
-        hdireita = altura(no->direita) + 1;
-    
-    return hesquerda > hdireita ? hesquerda : hdireita;
-}
+    int esquerda = 0,direita = 0;
 
-void printNo(No* no){
-    printf("\nPai: ");
-    if (no->pai != NULL)
-        printf("%d", no->pai->valor);
-    else
-        printf("NULL");
-    printf("\nEsquerda: ");
-    if (no->esquerda != NULL)
-        printf("%d", no->esquerda->valor);
-    else
-        printf("NULL");
-    printf("\nDireita: ");
-    if (no->direita != NULL)
-        printf("%d", no->direita->valor);
-    else
-        printf("NULL");
-    printf("\nValor: %d", no->valor);
-}
-
-No* adiciona(No* no, int valor, No* pai) {
-    if (vazio(no)) 
-        return cria(valor, pai);
-    else if(no->valor > valor)
-        no->esquerda = adiciona(no->esquerda, valor, no);
-    else if (no->valor < valor)
-        no->direita = adiciona(no->direita, valor, no);
-    
-    return no;
-}
-
-void remover(No* no){
-    if (no->esquerda)
-        remover(no->esquerda);
-    if (no->direita)
-        remover(no->direita);
-    free(no);
-}
-
-void percorrerPre(No* no) {
-    if (no != NULL) {
-        printf("%d ", no->valor);
-        percorrerPre(no->esquerda);
-        percorrerPre(no->direita);
+    if (no->esquerda != NULL) {
+        esquerda = altura(no->esquerda) + 1;
     }
-}
 
-void percorrerPos(No* no){
-    if (no->esquerda != NULL){
-        percorrerPos(no->esquerda);
+    if (no->direita != NULL) {
+        direita = altura(no->direita) + 1;
     }
-    if(no->direita != NULL){
-        percorrerPos(no->direita);
-    }
-    printf("%d ", no->valor);
-}
-
-void percorrerLargura(No* no){
-    Fila* fila = criaFila();
-    adicionarFila(fila, no);
-    int alt = 0;
-    while(fila->inicial){
-        no = removerFila(fila);
-        printf("%d ", no->valor);
-        if (no->esquerda)
-            adicionarFila(fila, no->esquerda);
-        if (no->direita)
-            adicionarFila(fila, no->direita);
-        alt = altura(no);
-    }
+  
+    return esquerda > direita ? esquerda : direita; //max(esquerda,direita)
 }
 
 int fb(No* no) {
-    int esquerda = 0;
-    int direita = 0;
-    if (no->esquerda != NULL) 
+    int esquerda = 0,direita = 0;
+  
+    if (no->esquerda != NULL) {
         esquerda = altura(no->esquerda) + 1;
-    if (no->direita != NULL) 
+    }
+
+    if (no->direita != NULL) {
         direita = altura(no->direita) + 1;
-    
+    }
+  
     return esquerda - direita;
 }
 
-No* rse(No* no) {
+No* rse(Arvore* arvore, No* no) {
     No* pai = no->pai;
     No* direita = no->direita;
-    
+
+    if (direita->esquerda != NULL) {
+        direita->esquerda->pai = no;
+    } 
+  
     no->direita = direita->esquerda;
     no->pai = direita;
+
     direita->esquerda = no;
     direita->pai = pai;
-    printf("RSE");
+
+    if (pai == NULL) {
+        arvore->raiz = direita;
+    } else {
+        if (pai->esquerda == no) {
+            pai->esquerda = direita;
+        } else {
+            pai->direita = direita;
+        }
+    }
+
     return direita;
 }
 
 
-No* rsd(No* no) {
+
+No* rsd(Arvore* arvore, No* no) {
     No* pai = no->pai;
     No* esquerda = no->esquerda;
-    
+
+    if (esquerda->direita != NULL) {
+        esquerda->direita->pai = no;
+    } 
+  
     no->esquerda = esquerda->direita;
     no->pai = esquerda;
+  
     esquerda->direita = no;
     esquerda->pai = pai;
-    printf("RSD");
+
+    if (pai == NULL) {
+        arvore->raiz = esquerda;
+    } else {
+        if (pai->esquerda == no) {
+            pai->esquerda = esquerda;
+        } else {
+            pai->direita = esquerda;
+        }
+    }
+
     return esquerda;
 }
 
-
-No* rde(No* no) {
-    no->direita = rsd(no->direita);
-    printf("RDE");
-    return rse(no);
+No* rde(Arvore* arvore, No* no) {
+    no->direita = rsd(arvore, no->direita);
+    return rse(arvore, no);
 }
 
-No* rdd(No* no) {
-    no->esquerda = rse(no->esquerda);
-    printf("RDD");
-    return rsd(no);
-}
-
-No* adicionaAVL(No* no, int valor) {
-    adiciona(no, valor, NULL);
-    if (no != NULL){
-        int balance = fb(no);
-        if (balance > 1 && valor < no->esquerda->valor)
-            return rsd(no);
-        else if (balance < -1 && valor > no->direita->valor)
-            return rse(no);
-        else if (balance > 1 && valor > no->esquerda->valor) 
-            return rdd(no);
-        else if (balance < -1 && valor < no->direita->valor) 
-            return rde(no);
-    }
-    return no;
+No* rdd(Arvore* arvore, No* no) {
+    no->esquerda = rse(arvore, no->esquerda);
+    return rsd(arvore, no);
 }
 
 int compara(const void* a, const void* b) {
@@ -241,22 +257,24 @@ int* geraVetor(int n) {
 
 int main()
 {
-    
-    int n = 1000;
+
+    int n = 10000;
     int* v = geraVetor(n + 1);
 
     int medio = v[rand() % n];
     int pior = (n * MAX) + 1;
     int melhor = v[0];
-    
-    No *raiz = adiciona(raiz, v[0], NULL);
-    for (int i=1;i<n;i++){
-        raiz = adicionaAVL(raiz, v[i]);
-    }
-    
-    printf("\n");
-    percorrerLargura(raiz);
 
+    clock_t begin = clock();
+    Arvore* a = criar();
+    for (int i=0;i<n;i++){
+        adicionar(a, v[i]);
+    }
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    
+    percorrer(a->raiz,visitar);
+    printf("\n%f", time_spent);
+    
     return 0;
 }
-
