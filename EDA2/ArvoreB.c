@@ -4,6 +4,8 @@
 
 #define MAX 1
 
+int n_operacoes = 0;
+
 typedef struct no {
     int total;
     int* chaves;
@@ -21,7 +23,7 @@ void visitar(int valor){
 }
 
 No* criaNo(ArvoreB*);
-ArvoreB* criaArvore(int);
+ArvoreB* criar(int);
 int transbordo(ArvoreB*, No*);
 int localizaChave(ArvoreB*, int);
 void adicionaChave(ArvoreB*, int);
@@ -44,7 +46,7 @@ No* criaNo(ArvoreB* arvore) {
     return no;
 }
 
-ArvoreB* criaArvore(int ordem) {
+ArvoreB* criar(int ordem) {
     ArvoreB* a = malloc(sizeof(ArvoreB));
     a->ordem = ordem;
     a->raiz = criaNo(a);
@@ -57,7 +59,6 @@ int transbordo(ArvoreB *arvore, No *no) {
 
 int localizaChave(ArvoreB* arvore, int chave) {
     No *no = arvore->raiz;
-    
     while (no != NULL) {
         int i = pesquisaBinaria(no, chave);
         if (i < no->total && no->chaves[i] == chave) {
@@ -126,6 +127,7 @@ void adicionaChaveNo(No* no, No* direita, int chave) {
 }
 
 No* divideNo(ArvoreB* arvore, No* no) {
+    n_operacoes++;
     int meio = no->total / 2;
     No* novo = criaNo(arvore);
     novo->pai = no->pai;
@@ -143,6 +145,7 @@ No* divideNo(ArvoreB* arvore, No* no) {
 }
 
 void adicionaChaveRecursivo(ArvoreB* arvore, No* no, No* novo, int chave) {
+    n_operacoes++;
     adicionaChaveNo(no, novo, chave);
     if (transbordo(arvore, no)) {
         int promovido = no->chaves[arvore->ordem];
@@ -178,24 +181,20 @@ int* geraVetor(int n) {
 
 int main()
 {
-
-    int n = 10000;
-    int* v = geraVetor(n + 1);
-
-    int medio = v[rand() % n];
-    int pior = (n * MAX) + 1;
-    int melhor = v[0];
-
-    clock_t begin = clock();
-    ArvoreB* arvore_B = criaArvore(1);
-    for (int i=0;i<n;i++){
-        adicionaChave(arvore_B, v[i]);
+    FILE *fp;
+    fp = fopen("results.txt", "w");
+    if (!fp){
+        printf("Can't open file\n");
+    }else{
+        int n = 10000;
+        int* v = geraVetor(n + 1);
+    
+        ArvoreB* a = criar(1);
+        for (int i=0;i<n;i++){
+            adicionaChave(a, v[i]);
+            printf("%d\n", n_operacoes);
+            fprintf(fp, "%d %d\n", i, n_operacoes);
+        }
     }
-    clock_t end = clock();
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    
-    percorreArvore(arvore_B->raiz, visitar);
-    printf("\n%f", time_spent);
-    
     return 0;
 }
