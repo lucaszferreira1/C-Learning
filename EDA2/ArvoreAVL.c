@@ -4,6 +4,8 @@
 
 #define MAX 1
 
+int n_operacoes = 0;
+
 typedef struct no {
     struct no* pai;
     struct no* esquerda;
@@ -124,19 +126,15 @@ void balanceamento(Arvore* arvore, No* no) {
         if (fator > 1) { //árvore mais pesada para esquerda
             //rotação para a direita
             if (fb(no->esquerda) > 0) {
-                printf("RSD(%d)\n",no->valor);
                 rsd(arvore, no); //rotação simples a direita, pois o FB do filho tem sinal igual
             } else {
-                printf("RDD(%d)\n",no->valor);
                 rdd(arvore, no); //rotação dupla a direita, pois o FB do filho tem sinal diferente
             }
         } else if (fator < -1) { //árvore mais pesada para a direita
             //rotação para a esquerda
             if (fb(no->direita) < 0) {
-                printf("RSE(%d)\n",no->valor);
                 rse(arvore, no); //rotação simples a esquerda, pois o FB do filho tem sinal igual
             } else {
-                printf("RDE(%d)\n",no->valor);
                 rde(arvore, no); //rotação dupla a esquerda, pois o FB do filho tem sinal diferente
             }
         }
@@ -174,6 +172,7 @@ int fb(No* no) {
 }
 
 No* rse(Arvore* arvore, No* no) {
+    n_operacoes++;
     No* pai = no->pai;
     No* direita = no->direita;
 
@@ -203,6 +202,7 @@ No* rse(Arvore* arvore, No* no) {
 
 
 No* rsd(Arvore* arvore, No* no) {
+    n_operacoes++;
     No* pai = no->pai;
     No* esquerda = no->esquerda;
 
@@ -230,13 +230,80 @@ No* rsd(Arvore* arvore, No* no) {
 }
 
 No* rde(Arvore* arvore, No* no) {
+    n_operacoes++;
     no->direita = rsd(arvore, no->direita);
     return rse(arvore, no);
 }
 
 No* rdd(Arvore* arvore, No* no) {
+    n_operacoes++;
     no->esquerda = rse(arvore, no->esquerda);
     return rsd(arvore, no);
+}
+
+No* minValueNo(No* no)
+{
+    No* curr = no;
+ 
+    while (curr->esquerda != NULL)
+        curr = curr->esquerda;
+ 
+    return curr;
+}
+
+No* deleteNo(No* raiz, int valor, Arvore *a)
+{
+    if (raiz == NULL)
+        return raiz;
+ 
+    if (valor < raiz->valor )
+        raiz->esquerda = deleteNo(raiz->esquerda, valor, a);
+ 
+    else if(valor > raiz->valor )
+        raiz->direita = deleteNo(raiz->direita, valor, a);
+ 
+    else{
+        if( (raiz->esquerda == NULL) || (raiz->direita == NULL) )
+        {
+            No *temp = raiz->esquerda ? raiz->esquerda : raiz->direita;
+ 
+            if (temp == NULL)
+            {
+                temp = raiz;
+                raiz = NULL;
+            }
+            else
+                *raiz = *temp;
+             
+            free(temp);
+        }
+        else{
+            No* temp = minValueNo(raiz->direita);
+ 
+            raiz->valor = temp->valor;
+ 
+            raiz->direita = deleteNo(raiz->direita, temp->valor, a);
+        }
+    }
+ 
+    if (raiz == NULL)
+      return raiz;
+ 
+    int balance = fb(raiz);
+ 
+    if (balance > 1 && fb(raiz->esquerda) >= 0)
+        return rsd(a, raiz);
+ 
+    if (balance > 1 && fb(raiz->esquerda) < 0)
+        return rdd(a, raiz);
+ 
+    if (balance < -1 && fb(raiz->direita) <= 0)
+        return rse(a, raiz);
+ 
+    if (balance < -1 && fb(raiz->direita) > 0)
+        return rde(a, raiz);
+ 
+    return raiz;
 }
 
 int compara(const void* a, const void* b) {
@@ -257,24 +324,28 @@ int* geraVetor(int n) {
 
 int main()
 {
-
-    int n = 10000;
-    int* v = geraVetor(n + 1);
-
-    int medio = v[rand() % n];
-    int pior = (n * MAX) + 1;
-    int melhor = v[0];
-
-    clock_t begin = clock();
-    Arvore* a = criar();
-    for (int i=0;i<n;i++){
-        adicionar(a, v[i]);
-    }
-    clock_t end = clock();
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    FILE *fp;
+    fp = fopen("results.txt", "w");
+    if (!fp){
+        printf("Can't open file\n");
+    }else{
+        int n = 10000;
+        int* v = geraVetor(n + 1);
     
-    percorrer(a->raiz,visitar);
-    printf("\n%f", time_spent);
+        Arvore* a = criar();
+        for (int i=0;i<n;i++){
+            adicionar(a, v[i]);
+            printf("%d %d\n", i, n_operacoes);
+            // fprintf(fp, "%d %d\n", i, n_operacoes);
+        }
+        n_operacoes = 0;
+        for (int i=0;i<n;i++){
+            deleteNo(a->raiz, v[i], a);
+            printf("%d %d\n", i, n_operacoes);
+            fprintf(fp, "%d %d\n", i, n_operacoes);
+        }
+        
+    }
     
     return 0;
 }
