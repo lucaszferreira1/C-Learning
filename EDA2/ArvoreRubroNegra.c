@@ -226,23 +226,35 @@ int* geraVetor(int n) {
 
 int main()
 {
-    FILE *fp;
-    fp = fopen("results.txt", "w");
-    if (!fp){
-        printf("Can't open file\n");
-    }else{
-        int n = 10000;
+    int vezes = 1000;
+    int n = 10000;
+    int sum[n];
+    for (int i=0;i<10000;i++){
+        sum[i] = 0;
+    }
+    for (int j=0;j<vezes;j++){
         int* v = geraVetor(n + 1);
     
         Arvore* a = criar();
         for (int i=0;i<n;i++){
             adicionar(a, v[i]);
-            printf("%d %d\n", i, n_operacoes);
-            fprintf(fp, "%d %d\n", i, n_operacoes);
+            sum[i] += n_operacoes;
             n_operacoes = 0;
         }
     }
-    return 0;
+    
+    
+    FILE *fp;
+    fp = fopen("results.txt", "w");
+    if (!fp){
+        printf("Can't open file\n");
+    }else{
+        float avrg;
+        for (int i=0;i<n;i++){
+            avrg = sum[i] / vezes;
+            fprintf(fp, "%d %f\n", i, avrg);
+        }
+    }
     
     return 0;
 }
