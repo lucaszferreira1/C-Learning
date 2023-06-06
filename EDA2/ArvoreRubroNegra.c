@@ -98,6 +98,7 @@ No* localizar(Arvore* arvore, int valor) {
         No* no = arvore->raiz;
 
         while (no != arvore->nulo) {
+            n_operacoes++;
             if (no->valor == valor) {
                 return no;
             } else {
@@ -115,6 +116,7 @@ void visitar(int valor){
 
 void balancear(Arvore* arvore, No* no) {
     while (no->pai->cor == Vermelho) {
+        n_operacoes++;
         if (no->pai == no->pai->pai->esquerda) {
             No *tio = no->pai->pai->direita;
             
@@ -237,6 +239,7 @@ int main()
             adicionar(a, v[i]);
             printf("%d %d\n", i, n_operacoes);
             fprintf(fp, "%d %d\n", i, n_operacoes);
+            n_operacoes = 0;
         }
     }
     return 0;
