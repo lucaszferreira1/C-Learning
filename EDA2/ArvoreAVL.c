@@ -39,7 +39,6 @@ int vazia(Arvore* arvore) {
 No* adicionarNo(No* no, int valor) {
     if (valor > no->valor) {
         if (no->direita == NULL) {
-            printf("Adicionando %d\n",valor);
             No* novo = malloc(sizeof(No));
             novo->valor = valor;
             novo->pai = no;
@@ -54,7 +53,6 @@ No* adicionarNo(No* no, int valor) {
         }
     } else {
         if (no->esquerda == NULL) {
-            printf("Adicionando %d\n",valor);
             No* novo = malloc(sizeof(No));
 			novo->valor = valor;
             novo->pai = no;
@@ -72,7 +70,6 @@ No* adicionarNo(No* no, int valor) {
 
 No* adicionar(Arvore* arvore, int valor) {
     if (vazia(arvore)) {
-        printf("Adicionando %d\n",valor);
         No* novo = malloc(sizeof(No));
         novo->valor = valor;
         novo->pai = NULL;
@@ -326,29 +323,39 @@ int* geraVetor(int n) {
 
 int main()
 {
-    FILE *fp;
-    fp = fopen("results.txt", "w");
-    if (!fp){
-        printf("Can't open file\n");
-    }else{
-        int n = 10000;
+    int vezes = 50;
+    int n = 10000;
+    int sum[n];
+    for (int i=0;i<10000;i++){
+        sum[i] = 0;
+    }
+    for (int j=0;j<vezes;j++){
+        
         int* v = geraVetor(n + 1);
     
         Arvore* a = criar();
         for (int i=0;i<n;i++){
             adicionar(a, v[i]);
-            printf("%d %d\n", i, n_operacoes);
-            // fprintf(fp, "%d %d\n", i, n_operacoes);
-	    n_operacoes = 0;
+            sum[i] += n_operacoes;
+	        n_operacoes = 0;
         }
-        n_operacoes = 0;
-        for (int i=0;i<n;i++){
-            deleteNo(a->raiz, v[i], a);
-            printf("%d %d\n", i, n_operacoes);
-            fprintf(fp, "%d %d\n", i, n_operacoes);
-        }
-        
+        // n_operacoes = 0;
+        // for (int i=0;i<n;i++){
+        //     deleteNo(a->raiz, v[i], a);
+        //     printf("%d %d\n", i, n_operacoes);
+        //     fprintf(fp, "%d %d\n", i, n_operacoes);
+        // }
     }
-    
+    FILE *fp;
+    fp = fopen("results.txt", "w");
+    if (!fp){
+        printf("Can't open file\n");
+    }else{
+        float avrg;
+        for (int i=0;i<n;i++){
+            avrg = sum[i] / vezes;
+            fprintf(fp, "%d %f\n", i, avrg);
+        }
+    }
     return 0;
 }
