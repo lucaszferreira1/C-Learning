@@ -105,6 +105,7 @@ No* localizaNo(ArvoreB* arvore, int chave) {
     No *no = arvore->raiz;
 
     while (no != NULL) {
+        n_operacoes++;
         int i = pesquisaBinaria(no, chave);
         if (no->filhos[i] == NULL)
             return no; //encontrou nó
@@ -194,6 +195,7 @@ int main()
             adicionaChave(a, v[i]);
             printf("%d\n", n_operacoes);
             fprintf(fp, "%d %d\n", i, n_operacoes);
+            n_operacoes = 0;
         }
     }
     return 0;
