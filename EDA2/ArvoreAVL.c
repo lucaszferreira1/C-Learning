@@ -90,6 +90,7 @@ No* adicionar(Arvore* arvore, int valor) {
 }
 
 No* localizar(No* no, int valor) {
+    n_operacoes++;
     if (no->valor == valor) {
         return no;
     } else {
@@ -121,6 +122,7 @@ void visitar(int valor){
 
 void balanceamento(Arvore* arvore, No* no) {
     while (no != NULL) {
+	n_operacoes++;
         int fator = fb(no);
 
         if (fator > 1) { //árvore mais pesada para esquerda
@@ -337,6 +339,7 @@ int main()
             adicionar(a, v[i]);
             printf("%d %d\n", i, n_operacoes);
             // fprintf(fp, "%d %d\n", i, n_operacoes);
+	    n_operacoes = 0;
         }
         n_operacoes = 0;
         for (int i=0;i<n;i++){
