@@ -229,7 +229,7 @@ int main()
     int vezes = 1000;
     int n = 10000;
     int sum[n];
-    for (int i=0;i<10000;i++){
+    for (int i=0;i<n;i++){
         sum[i] = 0;
     }
     for (int j=0;j<vezes;j++){
