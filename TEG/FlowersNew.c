@@ -133,6 +133,12 @@ Queue* bfs(int matriz[LEN][LEN], int no) {
 }
 
 
+float get_avrg_flor(Flor f){
+    float sum = f.sepLen + f.sepWid + f.petLen + f.petWid;
+    return sum / 4;
+}
+
+
 int main()
 {
     FILE *fp;
@@ -217,13 +223,19 @@ int main()
                 }
             }
         }
-        
+        float averages_clusters[3];
+        int count_avrg = 0;
+        float sum;
         for (int i=0;i<LEN;i++){
+            sum = 0;
             if (has_cluster[i]){
-                sum += lengthArr(arrays[i]);
-                printf("%d:\n", i);
                 for (int j=0;j<LEN;j++){
-                    printf("%d ", arrays[i][j]);
+                    if (arrays[i][j])
+                        sum += get_avrg_flor(flores[i]);
+                }
+                if (lengthArr(arrays[i]) > 5){
+                    averages_clusters[count_avrg] = sum / lengthArr(arrays[i]);
+                    count_avrg++;
                 }
             }
         }
