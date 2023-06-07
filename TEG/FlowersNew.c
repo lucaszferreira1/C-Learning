@@ -78,10 +78,26 @@ bool in(Queue* q, int key){
     return false;
 }
 
+bool inArr(int m[LEN], int key){
+    for (int i = 0;i < LEN;i++) {
+        if (m[i] == key)
+            return true;
+    }
+    return false;
+}
+
 int length(Queue* q){
     int cont = 0;
     for (int i = q->frente;i <= q->cauda;i++) 
         cont++;
+    return cont;
+}
+
+int lengthArr(bool m[LEN]){
+    int cont = 0;
+    for (int i = 0;i < LEN;i++) 
+        if (m[i])
+            cont++;
     return cont;
 }
 
@@ -94,22 +110,22 @@ void display(Queue* q) {
     }
 }
 
-Queue* bfs(float matriz[LEN][LEN], int no) {
+Queue* bfs(int matriz[LEN][LEN], int no) {
     bool visited[LEN] = { false };
 
     Queue* q = cria();
     Queue* v = cria();
+    
     append(q, no);
-    visited[no] = true;
+    append(v, no);
 
     while (!isEmpty(q)) {
         int currNo = pop(q);
-        append(v, currNo);
-
+        
         for (int i = 0; i < LEN; i++) {
-            if (matriz[currNo][i] != 0 && !visited[i]) {
+            if (matriz[currNo][i] != 0 && !in(v, i)) {
                 append(q, i);
-                visited[i] = true;
+                append(v, i);
             }
         }
     }
@@ -122,7 +138,6 @@ int main()
     FILE *fp;
     Flor flores[LEN];
     fp = fopen("IrisDataset.txt", "r");
-    // O arquivo é aberto e se lê o conteúdo, o qual vai para a lista flores
     if (!fp)
         printf("Can't open file\n");
     else{
@@ -148,18 +163,17 @@ int main()
     }
     
     fclose(fp);
-    
-    // Cálculo de distância euclideana
+
     if (flores){
         Flor pri, sec;
-        float matriz[LEN][LEN];
-        // Todos os valores são inicializados e setados para 0
+        int matriz[LEN][LEN];
         for (int i = 0;i < LEN;i++){
             for (int j = 0;j < LEN;j++){
                 matriz[i][j] = 0;
             }
         }
-        // É calculado a distância euclideana de todos para todos
+        
+        
         for (int i = 0;i < LEN;i++){
             for (int j = i + 1;j < LEN;j++){
                 pri = flores[i];
@@ -167,18 +181,51 @@ int main()
                 if (i != j){
                     float eucDist = pow(pow((pri.sepLen - sec.sepLen), 2) + pow((pri.sepWid - sec.sepWid), 2) + pow((pri.petLen - sec.petLen), 2) + pow((pri.petWid - sec.petWid), 2), 0.5);
                     if (eucDist <= .4){
-                        matriz[i][j] = eucDist;
+                        matriz[i][j] = 1;
+                        matriz[j][i] = 1;
                     }
                 }
             }
         }
         
+        
+        bool has_cluster[LEN];
+        bool arrays[LEN][LEN];
+        for(int i=0;i<LEN;i++){
+            for (int j=0;j<LEN;j++){
+                arrays[i][j] = false;
+            }
+        }
         Queue *vis = cria();
+        bool already_in;
+        int index_in;
+        for (int i = 0;i < LEN;i++){
+            already_in = false;
+            for (int j = 0;j < LEN;j++){
+                if (arrays[j][i]){
+                    already_in = true;
+                    has_cluster[i] = false;
+                    break;
+                }
+            }
+            if (!already_in){
+                has_cluster[i] = true;
+                vis = bfs(matriz, i);
+                for (int j=0;j<LEN;j++){
+                    if (in(vis, j))
+                        arrays[i][j] = true;
+                }
+            }
+        }
+        
         for (int i=0;i<LEN;i++){
-            
-            vis = bfs(matriz, i);
-            display(vis);
-            printf("\n Len = %d\n", length(vis));
+            if (has_cluster[i]){
+                sum += lengthArr(arrays[i]);
+                printf("%d:\n", i);
+                for (int j=0;j<LEN;j++){
+                    printf("%d ", arrays[i][j]);
+                }
+            }
         }
     }
     
