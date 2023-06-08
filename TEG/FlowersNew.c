@@ -223,7 +223,16 @@ int main()
                 }
             }
         }
+        
+        
+        
         float averages_clusters[3];
+        bool clusters[3][LEN];
+        for (int i = 0;i < 3;i++){
+            for (int j = 0;j < LEN;j++){
+                clusters[i][j] = false;
+            }    
+        }
         int count_avrg = 0;
         float sum;
         for (int i=0;i<LEN;i++){
@@ -234,11 +243,58 @@ int main()
                         sum += get_avrg_flor(flores[i]);
                 }
                 if (lengthArr(arrays[i]) > 5){
+                    for (int j = 0;j < LEN;j++){
+                        clusters[count_avrg][j] = arrays[i][j];
+                    }
                     averages_clusters[count_avrg] = sum / lengthArr(arrays[i]);
                     count_avrg++;
                 }
             }
         }
+        
+        
+        float f;
+        float dist, dist2;
+        
+        FILE *fp;
+        fp = fopen("result.txt", "w");
+        int pos;
+        if (!fp)
+            printf("Can't open file\n");
+        else{
+            for (int i=0;i<LEN;i++){
+                already_in = false;
+                for (int j = 0;j<3;j++){
+                    if (clusters[j][i])
+                        already_in = true;
+                }
+                pos = 0;
+                if (!already_in){
+                    f = get_avrg_flor(flores[i]);
+                    dist = f - averages_clusters[0];
+                    if (dist < 0)
+                        dist *= -1;
+                    for (int j = 1;j < 3;j++){
+                        dist2 = f - averages_clusters[j];
+                        if (dist2 < 0)
+                            dist2 *= -1;
+                        if (dist > dist2){
+                            dist = dist2;
+                            pos = j;
+                        }
+                    }
+                }else{
+                    for (int j = 0;j<3;j++){
+                        if (clusters[j][i])
+                            pos = j;
+                    }
+                }
+                fprintf(fp, "%d %d\n", i, pos);
+            }
+            fclose(fp);
+        }    
+        
+        
     }
     
     
