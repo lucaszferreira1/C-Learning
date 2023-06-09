@@ -186,7 +186,7 @@ int main()
                 sec = flores[j];
                 if (i != j){
                     float eucDist = pow(pow((pri.sepLen - sec.sepLen), 2) + pow((pri.sepWid - sec.sepWid), 2) + pow((pri.petLen - sec.petLen), 2) + pow((pri.petWid - sec.petWid), 2), 0.5);
-                    if (eucDist <= .4){
+                    if (eucDist <= .412){
                         matriz[i][j] = 1;
                         matriz[j][i] = 1;
                     }
