@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #define MAX 1
 
@@ -206,7 +207,188 @@ void rotacionarDireita(Arvore* arvore, No* no) {
     no->pai = esquerda;
 }
 
+bool isOnLeft(No* no){
+    return no == no->pai->esquerda; 
+}
+  
+No *irmao(No* no){
+    if (no->pai == NULL)
+        return NULL;
+    
+    if (isOnLeft(no))
+        return no->pai->direita;
+    
+    return no->pai->esquerda;
+}
 
+No *sucessor(No *no) {
+    No *temp = no;
+    
+    while (temp->esquerda != NULL)
+        temp = temp->esquerda;
+    
+    return temp;
+}
+
+bool hasRedChild(No* no) {
+    return (((no->esquerda != NULL) && (no->esquerda->cor == Vermelho)) || ((no->direita != NULL) && (no->direita->cor == Vermelho)));
+}
+
+void swapValues(No *u, No *v) {
+    int temp;
+    temp = u->valor;
+    u->valor = v->valor;
+    v->valor = temp;
+}
+
+No *findReplacement(No* no) {
+    // no com 2 filhos
+    if ((no->esquerda != NULL) && (no->direita != NULL))
+        return sucessor(no->direita);
+ 
+    // quando Folha
+    if (no->esquerda == NULL && no->direita == NULL)
+        return NULL;
+ 
+    // quando Filho Único
+    if (no->esquerda != NULL)
+        return no->esquerda;
+    else
+        return no->direita;
+}
+
+void fixDoubleBlack(Arvore* a, No *no) {
+    if (no == a->raiz)
+        return;
+     
+    No *irmaoNo = irmao(no);
+    No *pai = no->pai;
+    if (irmaoNo == NULL) {
+        fixDoubleBlack(a, pai);
+    } else {
+        if (irmaoNo->cor == Vermelho) {
+            // irmao vermelho
+            pai->cor = Vermelho;
+            irmaoNo->cor = Preto;
+            if (isOnLeft(irmaoNo)) {
+            // esquerda
+            rotacionarDireita(a, pai);
+            } else {
+            // direita
+            rotacionarEsquerda(a, pai);
+            }
+            fixDoubleBlack(a, no);
+        } else {
+            // irmao preto
+            if (hasRedChild(irmaoNo)) {
+                // pelo menos 1 filho vermelho
+                if (irmaoNo->esquerda != NULL && irmaoNo->esquerda->cor == Vermelho) {
+                    if (isOnLeft(irmaoNo)) {
+                        // esquerda esquerda
+                        irmaoNo->esquerda->cor = irmaoNo->cor;
+                        irmaoNo->cor = pai->cor;
+                        rotacionarDireita(a, pai);
+                    } else {
+                        // direita esquerda
+                        irmaoNo->esquerda->cor = pai->cor;
+                        rotacionarDireita(a, irmaoNo);
+                        rotacionarEsquerda(a, pai);
+                    }
+                } else {
+                    if (isOnLeft(irmaoNo)) {
+                        // esquerda direita
+                        irmaoNo->direita->cor = pai->cor;
+                        rotacionarEsquerda(a, irmaoNo);
+                        rotacionarDireita(a, pai);
+                    } else {
+                        // direita direita
+                        irmaoNo->direita->cor = irmaoNo->cor;
+                        irmaoNo->cor = pai->cor;
+                        rotacionarEsquerda(a, pai);
+                    }
+                }
+                pai->cor = Preto;
+            } else {
+                // 2 filhos pretos
+                irmaoNo->cor = Vermelho;
+                if (pai->cor == Preto)
+                    fixDoubleBlack(a, pai);
+                else
+                    pai->cor = Preto;
+            }
+        }
+    }
+}
+
+void removerNo(Arvore* a, No* no){
+    No* re = findReplacement(no);
+    // true quando no e re são pretos
+    bool nrPreto = ((re == NULL || re->cor == Preto) && (no->cor == Preto));
+    No *pai = no->pai;
+ 
+    if (re == NULL) {
+        // no é folha
+        if (no == a->raiz) {
+            a->raiz = NULL;
+        } else {
+            if (nrPreto) {
+                // re e no Pretos
+                // no é folha, fix double black em no
+                fixDoubleBlack(a, no);
+            } else {
+                // re ou no é vermelho
+                if (irmao(no) != NULL)
+                    irmao(no)->cor = Vermelho;
+            }
+            
+            // remove no da árvore
+            if (isOnLeft(no)) 
+                pai->esquerda = NULL;
+            else 
+                pai->direita = NULL;
+        }
+        free(no);
+        return;
+    }
+ 
+    if (no->esquerda == NULL || no->direita == NULL) {
+    // no tem 1 filho
+        if (no == a->raiz) {
+            no->valor = re->valor;
+            no->esquerda = NULL;
+            no->direita = NULL;
+            free(re);
+        } else {
+            if (isOnLeft(no)) {
+                pai->esquerda = re;
+            } else {
+                pai->direita = re;
+            }
+            free(no);
+            re->pai = pai;
+            if (nrPreto) {
+                fixDoubleBlack(a, re);
+                } else {
+                  re->cor = Preto;
+            }
+        }
+        return;
+    }
+ 
+    // no tem 2 filhos, troca de valor com sucessor e remove ele
+    swapValues(re, no);
+    removerNo(a, re);
+
+}
+
+void remover(Arvore *a, int valor){
+    if (vazia(a))
+        return;
+    No* no = localizar(a, valor);
+    if (no->valor == valor)
+        removerNo(a, no);
+    return;
+}
 
 int compara(const void* a, const void* b) {
     return (*(int*) a - *(int*) b);
