@@ -37,6 +37,7 @@ int vazia(Arvore* arvore) {
 }
 
 No* adicionarNo(No* no, int valor) {
+    n_operacoes++;
     if (valor > no->valor) {
         if (no->direita == NULL) {
             No* novo = malloc(sizeof(No));
@@ -315,9 +316,9 @@ int main()
     if (!fp){
         printf("Can't open file\n");
     }else{
-        int vezes = 1;
+        float vezes = 50;
         int n = 10000;
-        int sum[n];
+        float sum[n];
         for (int i=0;i<n;i++){
             sum[i] = 0;
         }
@@ -332,20 +333,20 @@ int main()
     	        n_operacoes = 0;
             }
             
-            n_operacoes = 0;
-            for (int i=0;i<n;i++){
-                deleteNo(a->raiz, v[i], a);
-                printf("%d %d\n", i, n_operacoes);
-                fprintf(fp, "%d %d\n", i, n_operacoes);
-                n_operacoes = 0;
-            }
-            
-            // float avrg;
+            // n_operacoes = 0;
             // for (int i=0;i<n;i++){
-            //     avrg = sum[i] / vezes;
-            //     fprintf(fp, "%d %f\n", i, avrg);
+            //     deleteNo(a->raiz, v[i], a);
+            //     printf("%d %d\n", i, n_operacoes);
+            //     fprintf(fp, "%d %d\n", i, n_operacoes);
+            //     n_operacoes = 0;
             // }
+            
         }
+        float avrg;
+            for (int i=0;i<n;i++){
+                avrg = sum[i] / vezes;
+                fprintf(fp, "%d %f\n", i, avrg);
+            }
     }
     return 0;
 }
