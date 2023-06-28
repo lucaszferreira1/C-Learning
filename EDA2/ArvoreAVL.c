@@ -252,56 +252,42 @@ No* minValueNo(No* no)
 
 No* deleteNo(No* raiz, int valor, Arvore *a)
 {
+    n_operacoes++;
     if (raiz == NULL)
         return raiz;
- 
     if (valor < raiz->valor )
         raiz->esquerda = deleteNo(raiz->esquerda, valor, a);
- 
     else if(valor > raiz->valor )
         raiz->direita = deleteNo(raiz->direita, valor, a);
- 
     else{
-        if( (raiz->esquerda == NULL) || (raiz->direita == NULL) )
-        {
+        if( (raiz->esquerda == NULL) || (raiz->direita == NULL) ){
             No *temp = raiz->esquerda ? raiz->esquerda : raiz->direita;
- 
-            if (temp == NULL)
-            {
+            if (temp == NULL){
                 temp = raiz;
                 raiz = NULL;
-            }
-            else
+            }else
                 *raiz = *temp;
-             
             free(temp);
-        }
-        else{
+        } else{
             No* temp = minValueNo(raiz->direita);
- 
             raiz->valor = temp->valor;
- 
             raiz->direita = deleteNo(raiz->direita, temp->valor, a);
         }
     }
  
     if (raiz == NULL)
       return raiz;
- 
     int balance = fb(raiz);
- 
+    
     if (balance > 1 && fb(raiz->esquerda) >= 0)
         return rsd(a, raiz);
- 
     if (balance > 1 && fb(raiz->esquerda) < 0)
         return rdd(a, raiz);
- 
     if (balance < -1 && fb(raiz->direita) <= 0)
         return rse(a, raiz);
- 
     if (balance < -1 && fb(raiz->direita) > 0)
         return rde(a, raiz);
- 
+    
     return raiz;
 }
 
@@ -323,38 +309,42 @@ int* geraVetor(int n) {
 
 int main()
 {
-    int vezes = 50;
-    int n = 10000;
-    int sum[n];
-    for (int i=0;i<n;i++){
-        sum[i] = 0;
-    }
-    for (int j=0;j<vezes;j++){
-        
-        int* v = geraVetor(n + 1);
-    
-        Arvore* a = criar();
-        for (int i=0;i<n;i++){
-            adicionar(a, v[i]);
-            sum[i] += n_operacoes;
-	        n_operacoes = 0;
-        }
-        // n_operacoes = 0;
-        // for (int i=0;i<n;i++){
-        //     deleteNo(a->raiz, v[i], a);
-        //     printf("%d %d\n", i, n_operacoes);
-        //     fprintf(fp, "%d %d\n", i, n_operacoes);
-        // }
-    }
+    // AVL
     FILE *fp;
     fp = fopen("results.txt", "w");
     if (!fp){
         printf("Can't open file\n");
     }else{
-        float avrg;
+        int vezes = 1;
+        int n = 10000;
+        int sum[n];
         for (int i=0;i<n;i++){
-            avrg = sum[i] / vezes;
-            fprintf(fp, "%d %f\n", i, avrg);
+            sum[i] = 0;
+        }
+        for (int j=0;j<vezes;j++){
+            
+            int* v = geraVetor(n + 1);
+        
+            Arvore* a = criar();
+            for (int i=0;i<n;i++){
+                adicionar(a, v[i]);
+                sum[i] += n_operacoes;
+    	        n_operacoes = 0;
+            }
+            
+            n_operacoes = 0;
+            for (int i=0;i<n;i++){
+                deleteNo(a->raiz, v[i], a);
+                printf("%d %d\n", i, n_operacoes);
+                fprintf(fp, "%d %d\n", i, n_operacoes);
+                n_operacoes = 0;
+            }
+            
+            // float avrg;
+            // for (int i=0;i<n;i++){
+            //     avrg = sum[i] / vezes;
+            //     fprintf(fp, "%d %f\n", i, avrg);
+            // }
         }
     }
     return 0;
