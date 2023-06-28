@@ -59,6 +59,7 @@ No* criarNo(Arvore* arvore, No* pai, int valor) {
 }
 
 No* adicionarNo(Arvore* arvore, No* no, int valor) {
+    n_operacoes++;
     if (valor > no->valor) {
         if (no->direita == arvore->nulo) {
             no->direita = criarNo(arvore, no, valor);     
@@ -419,7 +420,7 @@ int main()
     if (!fp){
         printf("Can't open file\n");
     } else {
-        int vezes = 1;
+        float vezes = 100;
         int n = 10000;
         int sum[n];
         for (int i=0;i<n;i++){
@@ -435,20 +436,18 @@ int main()
                 n_operacoes = 0;
             }
             
-            n_operacoes = 0;
-            for (int i=0;i<n;i++){
-                remover(a, v[i]);
-                printf("%d %d\n", i, n_operacoes);
-                fprintf(fp, "%d %d\n", i, n_operacoes);
-                n_operacoes = 0;
-            }
+            // for (int i=0;i<n;i++){
+            //     remover(a, v[i]);
+            //     fprintf(fp, "%d %d\n", i, n_operacoes);
+            //     n_operacoes = 0;
+            // }
         }
         
-        // float avrg;
-        // for (int i=0;i<n;i++){
-        //     avrg = sum[i] / vezes;
-        //     fprintf(fp, "%d %f\n", i, avrg);
-        // }
+        float avrg;
+        for (int i=0;i<n;i++){
+            avrg = sum[i] / vezes;
+            fprintf(fp, "%d %f\n", i, avrg);
+        }
     }
     
     return 0;
