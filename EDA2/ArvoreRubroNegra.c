@@ -258,7 +258,7 @@ No *findReplacement(No* no) {
 }
 
 void fixDoubleBlack(Arvore* a, No *no) {
-    if (no == a->raiz)
+    if (no == a->raiz || no == a->nulo)
         return;
      
     No *irmaoNo = irmao(no);
@@ -321,11 +321,14 @@ void fixDoubleBlack(Arvore* a, No *no) {
 }
 
 void removerNo(Arvore* a, No* no){
+    n_operacoes++;
     No* re = findReplacement(no);
     // true quando no e re são pretos
     bool nrPreto = ((re == NULL || re->cor == Preto) && (no->cor == Preto));
     No *pai = no->pai;
- 
+    if (pai == NULL)
+        return;
+    
     if (re == NULL) {
         // no é folha
         if (no == a->raiz) {
@@ -385,8 +388,10 @@ void remover(Arvore *a, int valor){
     if (vazia(a))
         return;
     No* no = localizar(a, valor);
-    if (no->valor == valor)
-        removerNo(a, no);
+    if (no != NULL){
+        if (no->valor == valor)
+            removerNo(a, no);
+    }
     return;
 }
 
@@ -408,34 +413,42 @@ int* geraVetor(int n) {
 
 int main()
 {
-    int vezes = 1000;
-    int n = 10000;
-    int sum[n];
-    for (int i=0;i<n;i++){
-        sum[i] = 0;
-    }
-    for (int j=0;j<vezes;j++){
-        int* v = geraVetor(n + 1);
-    
-        Arvore* a = criar();
-        for (int i=0;i<n;i++){
-            adicionar(a, v[i]);
-            sum[i] += n_operacoes;
-            n_operacoes = 0;
-        }
-    }
-    
-    
+    // Red Black
     FILE *fp;
     fp = fopen("results.txt", "w");
     if (!fp){
         printf("Can't open file\n");
-    }else{
-        float avrg;
+    } else {
+        int vezes = 1;
+        int n = 10000;
+        int sum[n];
         for (int i=0;i<n;i++){
-            avrg = sum[i] / vezes;
-            fprintf(fp, "%d %f\n", i, avrg);
+            sum[i] = 0;
         }
+        for (int j=0;j<vezes;j++){
+            int* v = geraVetor(n + 1);
+        
+            Arvore* a = criar();
+            for (int i=0;i<n;i++){
+                adicionar(a, v[i]);
+                sum[i] += n_operacoes;
+                n_operacoes = 0;
+            }
+            
+            n_operacoes = 0;
+            for (int i=0;i<n;i++){
+                remover(a, v[i]);
+                printf("%d %d\n", i, n_operacoes);
+                fprintf(fp, "%d %d\n", i, n_operacoes);
+                n_operacoes = 0;
+            }
+        }
+        
+        // float avrg;
+        // for (int i=0;i<n;i++){
+        //     avrg = sum[i] / vezes;
+        //     fprintf(fp, "%d %f\n", i, avrg);
+        // }
     }
     
     return 0;
