@@ -60,6 +60,7 @@ int transbordo(ArvoreB *arvore, No *no) {
 int localizaChave(ArvoreB* arvore, int chave) {
     No *no = arvore->raiz;
     while (no != NULL) {
+        n_operacoes++;
         int i = pesquisaBinaria(no, chave);
         if (i < no->total && no->chaves[i] == chave) {
             return 1; //encontrou
@@ -77,6 +78,7 @@ void adicionaChave(ArvoreB* arvore, int chave) {
 
 void percorreArvore(No* no, void (visita)(int chave)) {
     if (no != NULL) {
+        n_operacoes++;
         for (int i = 0; i < no->total; i++){
             percorreArvore(no->filhos[i], visita);
             
@@ -89,6 +91,7 @@ void percorreArvore(No* no, void (visita)(int chave)) {
 int pesquisaBinaria(No* no, int chave) {
     int inicio = 0, fim = no->total - 1, meio;
     while (inicio <= fim) {
+        n_operacoes++;
         meio = (inicio + fim) / 2;
         if (no->chaves[meio] == chave) {
             return meio; //encontrou
@@ -182,29 +185,28 @@ int* geraVetor(int n) {
 
 int main()
 {
-    int vezes = 1000;
-    int n = 10000;
-    int sum[n];
-    for (int i=0;i<n;i++){
-        sum[i] = 0;
-    }
-    for (int j=0;j<vezes;j++){
-        int* v = geraVetor(n + 1);
-    
-        ArvoreB* a = criar(10);
-        for (int i=0;i<n;i++){
-            adicionaChave(a, v[i]);
-            sum[i] += n_operacoes;
-            n_operacoes = 0;
-        }
-    }
-    
-    
     FILE *fp;
     fp = fopen("results.txt", "w");
     if (!fp){
         printf("Can't open file\n");
     }else{
+        float vezes = 2500;
+        int n = 10000;
+        float sum[n];
+        for (int i=0;i<n;i++){
+            sum[i] = 0;
+        }
+        for (int j=0;j<vezes;j++){
+            int* v = geraVetor(n + 1);
+        
+            ArvoreB* a = criar(5);
+            for (int i=0;i<n;i++){
+                adicionaChave(a, v[i]);
+                sum[i] += n_operacoes;
+                n_operacoes = 0;
+            }
+        }
+
         float avrg;
         for (int i=0;i<n;i++){
             avrg = sum[i] / vezes;
