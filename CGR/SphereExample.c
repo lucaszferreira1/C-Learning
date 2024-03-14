@@ -7,31 +7,30 @@
 #define FOV 60
 #define WIDTH 800
 #define HEIGHT 600
+#define ASPECT_RATIO 4/3
 
-// function to initialize 
-void ChangeSize(int w, int h)  
-    {  
-    GLfloat fAspect;  
-  
-    // Prevent a divide by zero  
-    if(h == 0)  
-        h = 1;  
-  
-    // Set Viewport to window dimensions  
-    glViewport(0, 0, w, h);  
-  
-    fAspect = (GLfloat)w/(GLfloat)h;  
-  
-    // Reset coordinate system  
-    glMatrixMode(GL_PROJECTION);  
-    glLoadIdentity();  
-  
-    // Produce the perspective projection  
-    gluPerspective(35.0f, fAspect, 1.0, 40.0);  
-  
-    glMatrixMode(GL_MODELVIEW);  
-    glLoadIdentity();  
-} 
+void init();
+void display();
+void idle();
+
+struct TVector{
+    double x, y, z;
+};
+
+struct TObject3D{
+    struct TVector position;
+    struct TVector velocity;
+};
+
+void init(){
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(FOV, ASPECT_RATIO, 0.1, 100);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(0, 0, 5, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    glColor3f(0.0f, 0.0f, 0.0f);
+}
 
 void display (void) 
 { 
@@ -41,7 +40,7 @@ void display (void)
 
     // Create a sphere
     glPushMatrix();
-    glTranslatef(0.0f, -6.0f, -20.0f);
+    glTranslatef(0.0f, -1.0f, -3.0f);
     pObj = gluNewQuadric();
     gluQuadricNormals(pObj, GLU_SMOOTH);
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -50,7 +49,12 @@ void display (void)
 
     glPopMatrix();
 	glutSwapBuffers();
-} 
+}
+
+void idle(){
+    // runPhysics();
+    display();
+}
 
 int main (int argc, char** argv) 
 { 
@@ -59,12 +63,16 @@ int main (int argc, char** argv)
 	
 	// giving window size in X- and Y- direction 
 	glutInitWindowSize(WIDTH, HEIGHT); 
-	glutInitWindowPosition(0, 0); 
+	glutInitWindowPosition(50, 50); 
 	
 	// Giving name to window 
 	glutCreateWindow("Sphere Drawing");
-    glutReshapeFunc(ChangeSize);
-	
-	glutDisplayFunc(display); 
+    
+    glutDisplayFunc(display);
+    glutIdleFunc(idle);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glViewport(0, 0, WIDTH, HEIGHT);
+    init();
+	 
 	glutMainLoop(); 
 } 
