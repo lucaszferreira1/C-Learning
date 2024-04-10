@@ -27,7 +27,6 @@ void *escolhe_lugar(void *arg){
 	for (int i=0;i < N_CLIENTES;i++){
 		dinheiro = rand() % 1000;
 		lugar = rand() % N_LUGARES;
-		// printf("%d ", lugar);
 		sem_wait(&sema_lugares[lugar]);
 		if (lugares[lugar] == 0)
 			compra_lugar(lugar, dinheiro);
